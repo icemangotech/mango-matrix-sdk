@@ -1,0 +1,4 @@
+{
+    "name": "egret",
+    "typings": "declarations/index.d.ts"
+}

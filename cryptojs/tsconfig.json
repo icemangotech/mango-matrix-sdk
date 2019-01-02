@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": true,
+        "outFile": "bin/cryptojs/cryptojs.js",
+        "allowJs": true
+    },
+    "files": [
+        "src/aes.js"
+    ]
+}

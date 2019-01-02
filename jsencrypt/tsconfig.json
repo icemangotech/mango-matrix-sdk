@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": true,
+        "outFile": "bin/jsencrypt/jsencrypt.js",
+        "allowJs": true
+    },
+    "files": [
+        "src/jsencrypt.js"
+    ]
+}
