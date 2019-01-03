@@ -1,12 +1,17 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "noImplicitAny": false,
-        "sourceMap": false,
-        "declaration": true,
-        "outFile": "bin/matrix/matrix.js"
+        "outFile": "bin/matrix/matrix.js",
+        "lib": [
+            "es5",
+            "es2015.promise"
+        ],
+        "declaration": true
     },
-    "include": [
-        "src"
+    "files": [
+        "./libs/cryptojs.d.ts",
+        "./libs/jsencrypt.d.ts",
+        "./libs/egret.d.ts",
+        "./src/matrix.ts"
     ]
 }
