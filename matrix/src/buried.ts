@@ -2,7 +2,7 @@
 
 namespace matrix {
 
-    enum BURRY_POINT_TYPE {
+    export enum BURRY_POINT_TYPE {
         HOME,
         PLANT,
         PET,
@@ -10,7 +10,7 @@ namespace matrix {
         ELIMATION,
     }
     
-    enum BURRY_POINT_REPORT_TYPE {
+    export enum BURRY_POINT_REPORT_TYPE {
         TICK,
         START,
         END,
@@ -18,7 +18,7 @@ namespace matrix {
         SLEEP,
     }
     
-    class BuriedPoint {
+    export class BuriedPoint {
     
         public static enable: boolean = true;	// 总开关
     
@@ -38,7 +38,6 @@ namespace matrix {
             if (type === BURRY_POINT_TYPE.PET) return "PET";
             if (type === BURRY_POINT_TYPE.EXPLORE) return "EXPLORE";
             if (type === BURRY_POINT_TYPE.ELIMATION) return "ELIMATION";
-            if (DEBUG) debugger;
         }
     
         public static initPageDic() {
@@ -98,7 +97,6 @@ namespace matrix {
             if (type === BURRY_POINT_REPORT_TYPE.END) return "end";
             if (type === BURRY_POINT_REPORT_TYPE.AWAKE) return "awake";
             if (type === BURRY_POINT_REPORT_TYPE.SLEEP) return "sleep";
-            if (DEBUG) debugger;
         }
     
         public static async reportAsync(type: BURRY_POINT_REPORT_TYPE) {
@@ -107,25 +105,35 @@ namespace matrix {
     
             let report_name: string = BuriedPoint.getReportName(type);
             if (BuriedPoint._report_async_arr.indexOf(type) < 0) {
-                console.warn(`埋点数据 ${name} 不需要异步执行`);
+                // console.warn(`埋点数据 ${name} 不需要异步执行`);
                 return;
             }
             if (!HttpRequest.sid) {
-                console.error("只有授权之后才能使用埋点接口");
+                // console.error("只有授权之后才能使用埋点接口");
                 return;
             }
             return new Promise(async (res, rej) => {
                 let data = BuriedPoint.getPostData();
                 try {
-                    let res_data: { orders: Object, page_stay_object_legal: boolean, "server_time": number } = await HttpRequest.post(`/app/heartbeat/${report_name}`, data);
-                    if (!res_data.page_stay_object_legal) console.warn("埋点数据不合理，请检查");
+                    const resData = await HttpRequest.post({
+                        url: `/app/heartbeat/${report_name}`,
+                        data,
+                    });
+                    let res_data: {
+                        orders: Object,
+                        page_stay_object_legal: boolean,
+                        "server_time": number,
+                    } = resData.data;
+                    if (!res_data.page_stay_object_legal) {
+                        // console.warn("埋点数据不合理，请检查");
+                    }
                     BuriedPoint.clearPageDic();
                     BuriedPoint._last_report_stamp = Date.now();
                     res(res_data);
                 } catch (e) {
                     // todo 不应该阻塞代码的执行，这里考虑删除
-                    WxPlatform.showToast("服务器开小差了");
-                    console.error(e);
+                    // WxPlatform.showToast("服务器开小差了");
+                    // console.error(e);
                 }
             });
         }
@@ -136,16 +144,19 @@ namespace matrix {
     
             let report_name: string = BuriedPoint.getReportName(type);
             if (BuriedPoint._report_async_arr.indexOf(type) >= 0) {
-                console.warn(`埋点数据 ${name} 需要异步执行`);
+                // console.warn(`埋点数据 ${name} 需要异步执行`);
                 return;
             }
             if (!HttpRequest.sid) {
-                console.error("只有授权之后才能使用埋点接口");
+                // console.error("只有授权之后才能使用埋点接口");
                 return;
             }
     
             let data = BuriedPoint.getPostData();
-            HttpRequest.post(`/app/heartbeat/${report_name}`, data);
+            HttpRequest.post({
+                url: `/app/heartbeat/${report_name}`,
+                data,
+            });
             BuriedPoint._last_report_stamp = Date.now();
             BuriedPoint.clearPageDic();
         }
@@ -181,7 +192,7 @@ namespace matrix {
             try {
                 await BuriedPoint.reportAsync(BURRY_POINT_REPORT_TYPE.TICK);
             } catch (e) {
-                console.error(e);
+                // console.error(e);
             }
         }
     
