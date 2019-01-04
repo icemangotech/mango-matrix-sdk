@@ -12,6 +12,8 @@
         "./libs/cryptojs.d.ts",
         "./libs/jsencrypt.d.ts",
         "./libs/egret.d.ts",
+        "./src/http.ts",
+        "./src/buried.ts",
         "./src/matrix.ts"
     ]
 }
