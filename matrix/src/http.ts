@@ -1,32 +1,36 @@
-namespace matrix {
-    export interface NetworkConfig {
-        url: string;
-        data?: {};
-    }
+/// <reference path="data.ts" />
 
+namespace matrix {
     export interface NetworkResponse<T = any> {
         code: number;
         cnmsg: string;
         enmsg: string;
         data: T | null;
+        version: string;
     }
 
     export class HttpRequest {
 
-        private static publicKey: string = `MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9EYcsLFRsvBrHtRsKg2wt/MNg
-fq0YB3U/9cuiuQMvREoH4ElRKlu9oawVwh3MAvfvOcudSbQd02UPqg3X/b6V4ErQ
-evfWUF6jJBmJJc4zBSg1U7YqmHX5p9ErZ710ahuurERIVj4pr75zQqHAw/Z3vZMV
-t2S8Do6xnVUEC2t2mwIDAQAB`;
-    
-        private static aesIv = '1234567890123456';
+        public static publicKey: null | string = null;
 
-        private static host = 'https://tge.wmp.brae.co';
+        public static host: null | string = null;
 
-        public static sid = null;
+        public static shareId: null | string = null;
+        public static shareDocId: null | string = null;
+        public static channelId: null | string = null;
+        public static mangoTmpid: null | string = null;
 
-        public static loginCode: string = '';
+        public static sid: null | string = null;
+
+        public static auth: null | WMP_AUTH = null;
+
+        private static aesIv: string = '1234567890123456';
 
         public static rsaEncrypt(text: string): string {
+            if (HttpRequest.publicKey === null) {
+                console.error('必须先调用init方法进行初始化');
+                return;
+            }
             let encrypt = new JSEncrypt();
             encrypt.setPublicKey(HttpRequest.publicKey);
             return text
@@ -87,7 +91,11 @@ t2S8Do6xnVUEC2t2mwIDAQAB`;
             return new Array(5 - str.length).join('0') + str;
         };
 
-        public static post({ url, data = {}}: NetworkConfig): Promise<NetworkResponse> {
+        public static post(url: string, data?: {}): Promise<NetworkResponse> {
+            if (HttpRequest.publicKey === null || HttpRequest.host === null) {
+                console.error('必须先调用init方法进行初始化');
+                return;
+            }
             const aesKey = HttpRequest.getAesEncryptKey();
             return new Promise((resolve, reject) => {
                 const postData = {

@@ -1,4 +1,1 @@
-/// <reference path="http.ts" />
-
-namespace matrix {
-}
+window['matrix'] = matrix;

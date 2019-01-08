@@ -4,7 +4,8 @@
         "outFile": "bin/matrix/matrix.js",
         "lib": [
             "es5",
-            "es2015.promise"
+            "es2015.promise",
+            "dom"
         ],
         "declaration": true
     },
@@ -13,8 +14,10 @@
         "./libs/jsencrypt.d.ts",
         "./libs/egret.d.ts",
         "./libs/game.d.ts",
+        "./src/data.ts",
         "./src/http.ts",
         "./src/buried.ts",
+        "./src/user.ts",
         "./src/matrix.ts"
     ]
 }
