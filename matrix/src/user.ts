@@ -36,7 +36,7 @@ namespace matrix {
     export async function wxLogin(): Promise<{
         code: string;
     }> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve: (response: { code: string }) => any, reject: () => any) => {
             wx.login({
                 success: (res) => {
                     resolve({ ...res });
@@ -121,7 +121,12 @@ namespace matrix {
         iv: string;
         encryptedData: string;
     }> {
-        return new Promise((resolve, reject) => {
+        return new Promise((
+            resolve: (
+                response: { iv: string; encryptedData: string }
+            ) => any,
+            reject: () => any
+        ) => {
             wx.getUserInfo({
                 withCredentials: true,
                 lang: 'zh_CN',
