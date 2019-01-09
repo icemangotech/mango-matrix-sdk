@@ -15,16 +15,13 @@ namespace matrix {
 
         public static host: null | string = null;
 
-        public static shareId: null | string = null;
-        public static shareDocId: null | string = null;
-        public static channelId: null | string = null;
-        public static mangoTmpid: null | string = null;
-
-        public static sid: null | string = null;
-
         public static auth: null | WMP_AUTH = null;
 
         private static aesIv: string = '1234567890123456';
+
+        public static platformData: WMP_PLATFORM_DATA = {
+            openid: null,
+        };
 
         public static rsaEncrypt(text: string): string {
             if (HttpRequest.publicKey === null) {
@@ -97,12 +94,13 @@ namespace matrix {
                 return;
             }
             const aesKey = HttpRequest.getAesEncryptKey();
+            const sid = wx.getStorageSync('sid');
             return new Promise((resolve, reject) => {
                 const postData = {
                     rand: aesKey,
                     timestamp: new Date().getTime(),
                     ua: 'wmp',
-                    sid: HttpRequest.sid,
+                    sid: sid,
                     data: data,
                 };
                 let postDataStr = this.unicodeEscape(JSON.stringify(postData));

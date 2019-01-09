@@ -1,194 +1,219 @@
 /// <reference path="http.ts" />
 
 namespace matrix {
+    export type BANNER_TYPE = {
+        click: number;
+        showtime: number;
+    };
 
-    export enum BURRY_POINT_TYPE {
-        HOME,
-        PLANT,
-        PET,
-        EXPLORE,
-        ELIMATION,
-    }
+    export type VIDEO_TYPE = Array<{
+        scene: string;
+        duration: number;
+        end: string;
+        time: number;
+    }>;
 
-    export enum BURRY_POINT_REPORT_TYPE {
-        TICK,
-        START,
-        END,
-        AWAKE,
-        SLEEP,
-    }
+    export type EVENT_TYPE = Array<{
+        key: string;
+        time: number;
+        part1: string | null;
+        part2: string | null;
+        extra: any;
+    }>;
+
+    export type PAGE_TYPE = {
+        time: number;
+        duration: number;
+        lastEnterTime: number;
+    };
+
+    export type POST_DATA_TYPE = {
+        current_timestamp: number;
+        start_timestamp: number;
+        page_stay: {
+            [k: string]: [number, number],
+        };
+        ad: {
+            banner: {
+                click: 0,
+                showtime: 0,
+            };
+            video: Array<{
+                scene: string;
+                duration: number;
+                end: string;
+                time: number;
+            }>;
+        };
+        event: Array<{
+            key: string;
+            time: number;
+            part1: string | null;
+            part2: string | null;
+            extra: any;
+        }>;
+    };
 
     export class BuriedPoint {
+        public static lastTimestamp: number = 0;
 
-        public static enable: boolean = true;   // 总开关
+        public static pages: { [k: string]: PAGE_TYPE } = {};
 
-        private static _page_dic: Object;       // key 为埋点枚举, value[0]为进入次数， value[1]为停留时长
+        public static banner: BANNER_TYPE = {
+            click: 0,
+            showtime: 0,
+        };
 
-        private static _all_burry_type: BURRY_POINT_TYPE[] = [
-            BURRY_POINT_TYPE.HOME,
-            BURRY_POINT_TYPE.PLANT,
-            BURRY_POINT_TYPE.PET,
-            BURRY_POINT_TYPE.EXPLORE,
-            BURRY_POINT_TYPE.ELIMATION,
-        ]
+        public static videos: VIDEO_TYPE = [];
 
-        private static getBurryName(type: BURRY_POINT_TYPE): string {
-            if (type === BURRY_POINT_TYPE.HOME) return "HOME";
-            if (type === BURRY_POINT_TYPE.PLANT) return "PLANT";
-            if (type === BURRY_POINT_TYPE.PET) return "PET";
-            if (type === BURRY_POINT_TYPE.EXPLORE) return "EXPLORE";
-            if (type === BURRY_POINT_TYPE.ELIMATION) return "ELIMATION";
-            if (DEBUG) debugger;
+        public static events: EVENT_TYPE = [];
+
+        private static timer: number | null = null;
+
+        public static onGameStart(): Promise<{
+            'page_stay_object_legal': boolean;
+            'ad.banner_object_legal': boolean;
+            'ad.video_array_legal': boolean;
+            'event_array_legal': boolean;
+        }> {
+            this.lastTimestamp = Date.now();
+            const postData = this.getPostData();
+            this.timer = this.onGameTick();
+            return HttpRequest.post('/app/heartbeat/start', postData)
+                .then((res) => {
+                    this.resetData();
+                    this.lastTimestamp = Date.now();
+                    return res.data;
+                });
         }
 
-        public static initPageDic() {
-            if (BuriedPoint._page_dic) return;
-            let dic = BuriedPoint._page_dic = {};
-            let arr = BuriedPoint._all_burry_type;
-            for (let i = 0, iLen = arr.length; i < iLen; i++) {
-                let type = arr[i];
-                dic[type] = [0, 0];
-            }
-        }
-
-        private static _cur_burry_point: BURRY_POINT_TYPE;
-
-        private static clearPageDic() {
-            if (!BuriedPoint._page_dic) return;
-
-            let dic = BuriedPoint._page_dic;
-            let arr = BuriedPoint._all_burry_type;
-            for (let i = 0, iLen = arr.length; i < iLen; i++) {
-                let type = arr[i];
-                dic[type][0] = dic[type][1] = 0;
-            }
-        }
-
-        private static getPostData(): Object {
-            let rst: any = {};
-            rst.current_timestamp = Date.now();
-            rst.start_timestamp = BuriedPoint._last_report_stamp || egret.sys.$START_TIME;
-            let dic = BuriedPoint._page_dic;
-            let arr = BuriedPoint._all_burry_type;
-            let page_data = {};
-            for (let i = 0, iLen = arr.length; i < iLen; i++) {
-                let type = arr[i];
-                let data = dic[type];
-                let name = BuriedPoint.getBurryName(type);
-                if (dic[type][1] !== 0) {
-                    page_data[name] = data.concat();
-                }
-            }
-            rst.page_stay = page_data;
-
-            return rst;
-        }
-
-        private static _report_async_arr: BURRY_POINT_REPORT_TYPE[] = [
-            BURRY_POINT_REPORT_TYPE.TICK,
-            BURRY_POINT_REPORT_TYPE.START,
-            BURRY_POINT_REPORT_TYPE.AWAKE,
-        ]
-
-        private static _last_report_stamp: number;
-
-        private static getReportName(type: BURRY_POINT_REPORT_TYPE): string {
-            if (type === BURRY_POINT_REPORT_TYPE.TICK) return "tick";
-            if (type === BURRY_POINT_REPORT_TYPE.START) return "start";
-            if (type === BURRY_POINT_REPORT_TYPE.END) return "end";
-            if (type === BURRY_POINT_REPORT_TYPE.AWAKE) return "awake";
-            if (type === BURRY_POINT_REPORT_TYPE.SLEEP) return "sleep";
-            if (DEBUG) debugger;
-        }
-
-        public static async reportAsync(type: BURRY_POINT_REPORT_TYPE) {
-            if (!BuriedPoint._page_dic) return;
-            if (!BuriedPoint.enable) return;
-
-            let report_name: string = BuriedPoint.getReportName(type);
-            if (BuriedPoint._report_async_arr.indexOf(type) < 0) {
-                console.warn(`埋点数据 ${name} 不需要异步执行`);
-                return;
-            }
-            if (!HttpRequest.sid) {
-                console.error("只有授权之后才能使用埋点接口");
-                return;
-            }
-            return new Promise(async (res, rej) => {
-                let data = BuriedPoint.getPostData();
+        private static onGameTick(): number {
+            return setTimeout(async () => {
+                const postData = this.getPostData();
                 try {
-                    const resData = await HttpRequest.post(`/app/heartbeat/${report_name}`, data);
-                    let res_data: {
-                        orders: Object,
-                        page_stay_object_legal: boolean,
-                        server_time: number,
-                    } = resData.data;
-                    if (!res_data.page_stay_object_legal) console.warn("埋点数据不合理，请检查");
-                    BuriedPoint.clearPageDic();
-                    BuriedPoint._last_report_stamp = Date.now();
-                    res(res_data);
-                } catch (e) {
-                    // todo 不应该阻塞代码的执行，这里考虑删除
-                    // WxPlatform.showToast("服务器开小差了");
-                    console.error(e);
+                    await HttpRequest.post('/app/heartbeat/tick', postData);
+                    this.lastTimestamp = Date.now();
+                    this.resetData();
+                    this.timer = this.onGameTick();
+                } catch(e) {
+                    //
                 }
+            }, 60000);
+        }
+
+        public static onGameAwake(): Promise<{
+            'page_stay_object_legal': boolean;
+            'ad.banner_object_legal': boolean;
+            'ad.video_array_legal': boolean;
+            'event_array_legal': boolean;
+        }> {
+            this.lastTimestamp = Date.now();
+            const postData = this.getPostData();
+            this.timer = this.onGameTick();
+            return HttpRequest.post('/app/heartbeat/awake', postData)
+                .then((res) => {
+                    this.resetData();
+                    this.lastTimestamp = Date.now();
+                    return res.data;
+                })
+        }
+
+        public static onGameSleep(): Promise<{
+            'page_stay_object_legal': boolean;
+            'ad.banner_object_legal': boolean;
+            'ad.video_array_legal': boolean;
+            'event_array_legal': boolean;
+        }> {
+            const postData = this.getPostData();
+            this.timer && clearTimeout(this.timer);
+            return HttpRequest.post('/app/heartbeat/sleep', postData)
+                .then((res) => {
+                    this.resetData();
+                    this.lastTimestamp = Date.now();
+                    return res.data;
+                })
+        }
+
+        private static resetData(): void {
+            this.pages = {};
+            this.banner  = {
+                click: 0,
+                showtime: 0,
+            };
+            this.videos = [];
+            this.events = [];
+        }
+
+        private static getPostData(): POST_DATA_TYPE {
+            const current_timestamp = Date.now();
+            const start_timestamp = this.lastTimestamp;
+            const page_stay = {};
+            for (let key in this.pages) {
+                page_stay[key] = [this.pages[key].time, this.pages[key].duration + Date.now() - this.pages[key].lastEnterTime];
+            }
+            return {
+                current_timestamp,
+                start_timestamp,
+                page_stay,
+                ad: {
+                    banner: {
+                        click: 0,
+                        showtime: 0,
+                    },
+                    video: [...this.videos],
+                },
+                event: [...this.events],
+            };
+        }
+
+        public static onEnterScene(sceneName: string): void {
+            if (sceneName in this.pages) {
+                this.pages[sceneName].lastEnterTime = Date.now();
+                this.pages[sceneName].time += 1;
+            } else {
+                this.pages[sceneName] = {
+                    time: 1,
+                    duration: 0,
+                    lastEnterTime: Date.now(),
+                };
+            }
+        }
+
+        public static onLeaveScene(sceneName: string): void {
+            if (sceneName in this.pages) {
+                this.pages[sceneName].duration += Date.now() - this.pages[sceneName].lastEnterTime;
+            }
+        }
+
+        // public static onAdBannerShow(): void {
+        // }
+
+        // public static onAdBannerClose(): void {
+        // }
+
+        // public static onAdVideoShow(scene: string, duration: number): void {
+        // }
+
+        public static onAdVideoClose(scene: string, isEnd: boolean): void {
+            this.videos.push({
+                scene,
+                duration: 15000,
+                end: isEnd ? 'FINISH' : 'CLOSE',
+                time: Date.now(),
             });
         }
 
-        public static reportSync(type: BURRY_POINT_REPORT_TYPE) {
-            if (!BuriedPoint._page_dic) return;
-            if (!BuriedPoint.enable) return;
+        // public static onAdVideoError(): void {
+        // }
 
-            let report_name: string = BuriedPoint.getReportName(type);
-            if (BuriedPoint._report_async_arr.indexOf(type) >= 0) {
-                console.warn(`埋点数据 ${name} 需要异步执行`);
-                return;
-            }
-            if (!HttpRequest.sid) {
-                console.error("只有授权之后才能使用埋点接口");
-                return;
-            }
-
-            let data = BuriedPoint.getPostData();
-            HttpRequest.post(`/app/heartbeat/${report_name}`, data);
-            BuriedPoint._last_report_stamp = Date.now();
-            BuriedPoint.clearPageDic();
+        public static onEventTrigger(evnetName: string, part1: string | null = null, part2: string | null = null, extra: any = {}): void {
+            this.events.push({
+                key: evnetName,
+                part1,
+                part2,
+                extra,
+                time: Date.now(),
+            });
         }
-
-        private static _last_point_start_stamp: number;
-
-        public static changePoint(type: BURRY_POINT_TYPE) {
-            BuriedPoint.initPageDic();
-            let hasLastPoint = BuriedPoint._cur_burry_point != undefined;
-            if (BuriedPoint._last_point_start_stamp && hasLastPoint) {
-                let elapse = Date.now() - BuriedPoint._last_point_start_stamp;
-                BuriedPoint._page_dic[BuriedPoint._cur_burry_point][1] += elapse;
-            }
-            BuriedPoint._last_point_start_stamp = Date.now();
-            BuriedPoint._cur_burry_point = type;
-            hasLastPoint && BuriedPoint._page_dic[type][0]++;
-        }
-
-        private static _heart_timer: number;
-        public static registerHeartTick() {
-            BuriedPoint.initPageDic();
-            BuriedPoint.unRegisterHeartTick();
-            BuriedPoint._heart_timer = egret.setTimeout(BuriedPoint.onHeartTick, BuriedPoint, 60 * 1000);
-        }
-
-        public static unRegisterHeartTick() {
-            if (BuriedPoint._heart_timer != undefined) {
-                egret.clearTimeout(BuriedPoint._heart_timer);
-            }
-        }
-
-        private static async onHeartTick() {
-            try {
-                await BuriedPoint.reportAsync(BURRY_POINT_REPORT_TYPE.TICK);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
     }
 }

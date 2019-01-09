@@ -1,0 +1,34 @@
+/// <reference path="http.ts" />
+
+namespace matrix {
+    export function getAllShareUsers<T>(): Promise<{
+        last_page: boolean;
+        invite_count: number;
+        invite_count_today: number;
+        users: Array<{
+            id: number;
+            avatar: string;
+            config: T;
+        }>,
+        today_login: null;      // @todo
+    }> {
+        return HttpRequest.post('/share/users', {})
+            .then(res => res.data);
+    }
+
+    export function getShareUserInfo<T>(userId: number): Promise<{
+        id: number;
+        avatar: string;
+        config: T;
+    }> {
+        return HttpRequest.post(`/share/user/${userId}`, {})
+            .then((res) => res.data);
+    }
+
+    export function updateShareUserInfo<T>(userId: number, config: T): Promise<{
+        config: T;
+    }> {
+        return HttpRequest.post(`share/user/config/${userId}`, config)
+            .then((res) => res.data);
+    }
+}
