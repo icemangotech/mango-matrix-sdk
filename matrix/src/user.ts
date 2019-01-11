@@ -160,7 +160,9 @@ namespace matrix {
      * 获取游戏配置
      */
     export async function getGameConfig<G>(): Promise<{
-        game_config: G
+        game_config: G,
+        navigate: NAVIGATE_BOX_ITEM_TYPE,
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>,
     }> {
         return HttpRequest.post('/game/config', {})
             .then((res) => res.data);

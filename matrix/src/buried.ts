@@ -52,6 +52,11 @@ namespace matrix {
             part2: string | null;
             extra: any;
         }>;
+        navigate: Array<{
+            id: number;
+            type: 'click' | 'confirm',
+            time: number;
+        }>;
     };
 
     export class BuriedPoint {
@@ -67,6 +72,12 @@ namespace matrix {
         public static videos: VIDEO_TYPE = [];
 
         public static events: EVENT_TYPE = [];
+
+        public static navigate: Array<{
+            id: number;
+            type: 'click' | 'confirm',
+            time: number;
+        }> = [];
 
         private static timer: number | null = null;
 
@@ -142,6 +153,7 @@ namespace matrix {
             };
             this.videos = [];
             this.events = [];
+            this.navigate = [];
         }
 
         private static getPostData(): POST_DATA_TYPE {
@@ -163,6 +175,7 @@ namespace matrix {
                     video: [...this.videos],
                 },
                 event: [...this.events],
+                navigate: [...this.navigate],
             };
         }
 
@@ -212,6 +225,22 @@ namespace matrix {
                 part1,
                 part2,
                 extra,
+                time: Date.now(),
+            });
+        }
+
+        public static onNavigateBoxItemClick(id: number) {
+            this.navigate.push({
+                id,
+                type: 'click',
+                time: Date.now(),
+            });
+        }
+
+        public static onNavigateBoxItemConfirm(id: number) {
+            this.navigate.push({
+                id,
+                type: 'confirm',
                 time: Date.now(),
             });
         }

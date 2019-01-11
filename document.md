@@ -1,9 +1,13 @@
 ## mongo-matrix接入文档
 
 ### 1. 安装
+
 #### Egret
+
 #### Layabox
+
 #### Cocos Creator
+
 
 ### 2. 初始化
 
@@ -274,3 +278,16 @@
     ``` ts
     onEventTrigger(evnetName: string, part1?: string | null, part2?: string | null, extra?: any): void;
     ```
+
+* 游戏盒子某个游戏被点击 matrix.BuriedPoint.onNavigateBoxItemClick:
+
+    ``` ts
+    onNavigateBoxItemClick(id: number);
+    ```
+
+* 游戏盒子确认跳转某个消息 matrix.BuriedPoint.onNavigateBoxItemConfirm:
+
+    ``` ts
+    onNavigateBoxItemConfirm(id: number);
+    ```
+

@@ -49,4 +49,16 @@ namespace matrix {
         week_friends_ranking: string,       // 本周好友榜排名，若游戏未开启好友榜功能则为null
         friends_ranking: string,            // 好友榜总排名，若游戏未开启好友榜功能则为null
     }
+
+    export type NAVIGATE_BOX_ITEM_TYPE = {
+        id: number;
+        pic: string;
+        appId: string,
+        query: {
+            [k: string]: any;
+        };
+        path: string;
+        extraData: any;
+        envVersion: string;
+    };
 }
