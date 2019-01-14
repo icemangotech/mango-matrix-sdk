@@ -211,15 +211,6 @@
     }>;
     ```
 
-
-* **Example:**:
-
-进入小游戏时，确保 `matrix.init` 方法在其他方法之前被执行。之后调用 `matrix.login`进行用户登录并获取用户信息和用户的游戏数据，如果用户未进行过授权，则返回的数据 `user_data` 字段中的用户信息为null。
-
-如果小游戏中需要使用到用户昵称、头像等用户信息，首先需要授权。利用微信小游戏API`wx.authorize`可以知道用户是否授权过小游戏获取用户信息。如果用户为授权，需要利用微信小游戏API`wx.createUserInfoButton`新建`UserInfoButton`。注意新建的时候`withCredentials`应该为`true`。在`UserInfoButton`的`onTap`事件中，我们可以通过返回值获取`iv`、`encryptedData`，此时应该在`onTap`事件中调用`matrix.onAuth({iv, encryptedData})`。如果用户已经授权过，可以直接调用`wx.getUserInfo`来获取最新的用户信息。
-
-用户进行游戏后，可以通过`matrix.submitScore`提交分数，通过`matrix.submitExtra`提交新的`extra`数据。
-
 ### 4. 数据统计
 
 * 游戏启动 matrix.BuriedPoint.onGameStart：
@@ -291,3 +282,15 @@
     onNavigateBoxItemConfirm(id: number);
     ```
 
+
+### **Example:**
+
+#### 用户登录与授权
+
+进入小游戏时，确保 `matrix.init` 方法在其他方法之前被执行。之后调用 `matrix.login`进行用户登录并获取用户信息和用户的游戏数据，如果用户未进行过授权，则返回的数据 `user_data` 字段中的用户信息为null。
+
+如果小游戏中需要使用到用户昵称、头像等用户信息，首先需要授权。利用微信小游戏API`wx.authorize`可以知道用户是否授权过小游戏获取用户信息。如果用户为授权，需要利用微信小游戏API`wx.createUserInfoButton`新建`UserInfoButton`。注意新建的时候`withCredentials`应该为`true`。在`UserInfoButton`的`onTap`事件中，我们可以通过返回值获取`iv`、`encryptedData`，此时应该在`onTap`事件中调用`matrix.onAuth({iv, encryptedData})`。如果用户已经授权过，可以直接调用`wx.getUserInfo`来获取最新的用户信息。
+
+#### 用户游戏数据
+
+用户进行游戏后，可以通过`matrix.submitScore`提交分数，通过`matrix.submitExtra`提交新的`extra`数据。
