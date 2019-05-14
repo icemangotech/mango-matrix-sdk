@@ -74,6 +74,23 @@
     ```
     其中 `extra` 为开发者自定义的游戏数据，用来存储开发者定义的用户在游戏中的数据。
 
+    跳转小游戏数据：
+    ``` ts
+    type NAVIGATE_BOX_ITEM_TYPE = {
+        id: number;
+        pic: string;
+        icon: string;
+        name: string;
+        appId: string;
+        query: {
+            [k: string]: any;
+        };
+        path: string;
+        extraData: any;
+        envVersion: string;
+    };
+    ```
+
 * 用户登录 matrix.login:
 
     ``` ts
@@ -83,6 +100,8 @@
         user_data: USER_DATA_TYPE;
         user_game_data: USER_GAME_DATA_TYPE<T>;
         game_config: G;
+        navigate: NAVIGATE_BOX_ITEM_TYPE;
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }>
     ```
@@ -96,6 +115,8 @@
         user_data: USER_DATA_TYPE;
         user_game_data: USER_GAME_DATA_TYPE<T>;
         game_config: G;
+        navigate: NAVIGATE_BOX_ITEM_TYPE;
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }>;
     ```
@@ -211,7 +232,20 @@
     }>;
     ```
 
-### 4. 数据统计
+### 4. 分享相关
+
+* 获取指定键名对应的文案 matrix.getShareDoc:
+
+    ``` ts
+    function getShareDoc(docKey: any): Promise<{
+        button_name: string;
+        id: string | null;
+        title: string;
+        image: string;
+    }>;
+    ```
+
+### 5. 数据统计
 
 * 游戏启动 matrix.BuriedPoint.onGameStart：
 

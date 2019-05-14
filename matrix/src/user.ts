@@ -66,6 +66,8 @@ namespace matrix {
         user_data: USER_DATA_TYPE;
         user_game_data: USER_GAME_DATA_TYPE<T>;
         game_config: G;
+        navigate: NAVIGATE_BOX_ITEM_TYPE;
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }> {
         const shareId = wx.getStorageSync('share_id');
