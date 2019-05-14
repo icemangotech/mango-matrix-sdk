@@ -1,4 +1,5 @@
 /// <reference path="data.ts" />
+/// <reference path="matrix.ts" />
 
 namespace matrix {
     export interface NetworkResponse<T = any> {
@@ -14,6 +15,8 @@ namespace matrix {
         public static publicKey: null | string = null;
 
         public static host: null | string = null;
+
+        public static gameVersion: null | string = null;
 
         public static auth: null | WMP_AUTH = null;
 
@@ -101,6 +104,8 @@ namespace matrix {
                     timestamp: new Date().getTime(),
                     ua: 'wmp',
                     sid: sid,
+                    v: HttpRequest.gameVersion,
+                    sv: matrix.version,
                     data: data,
                 };
                 let postDataStr = this.unicodeEscape(JSON.stringify(postData));
