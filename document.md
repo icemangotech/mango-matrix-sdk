@@ -11,7 +11,7 @@
 
 ### 2. 初始化
 
-* 申请请求主机名 `host` 和RSA加密公钥 `rsaPublicKey`；
+* 与我方申请获取域名 `host` 和RSA加密公钥 `rsaPublicKey`；
 
 * 在项目代码中添加初始化代码：
     ``` ts
@@ -41,7 +41,7 @@
     }
     ```
 
-    用户分享数据：
+    用户分享数据（在微信封分享之后，该对象意义已经不大）：
     ``` ts
     type USER_GAME_DATA_SHARE_TYPE = {
         time_count: number,                 // 成功分享次数
@@ -72,7 +72,7 @@
         extra: T,
     }
     ```
-    其中 `extra` 为开发者自定义的游戏数据，用来存储开发者定义的用户在游戏中的数据。
+    其中 `extra` 为开发者自定义的游戏数据，用来存储开发者定义的用户在游戏中的数据，相当于存档功能，该存档只有用户自己可见。
 
     跳转小游戏数据：
     ``` ts
@@ -91,7 +91,7 @@
     };
     ```
 
-* 用户登录 matrix.login:
+* 用户登录 matrix.login（需要在代码**可以运行**后立即调用，以保证对于用户流失点统计的准确性。本SDK大部分接口也是必须在login完成后才能使用）:
 
     ``` ts
     function login<T, G>(): Promise<{
@@ -143,7 +143,7 @@
     }>;
     ```
 
-* 获取游戏配置 matrix.getGameConfig:
+* 获取游戏配置 matrix.getGameConfig (可区分游戏版本配置不同的值，需要事先与后台约定）:
 
     ``` ts
     function getGameConfig<G>(): Promise<{
@@ -151,7 +151,7 @@
     }>;
     ```
 
-* 提交分数 extra.submitScore:
+* 提交分数 extra.submitScore（用来维护排行榜功能）:
 
     ``` ts
     function submitScore<T>(score: number): Promise<{
@@ -161,7 +161,8 @@
     }>;
     ```
 
-* 提交extra extra.submitExtra:
+* 提交extra extra.submitExtra（提交存档与分数）:
+    `extra`操作方式的具体文档：[传送门](https://github.com/fdreamsu/mongo-matrix-sdk-doc/wiki/%E9%94%AE%E5%80%BC%E5%AF%B9%E5%AD%98%E5%82%A8%E7%9B%B8%E5%85%B3%E5%AE%9A%E4%B9%89)
 
     ``` ts
     function submitExtra<T>(extra: T, returnUserGameData: number, score?: number | null): Promise<{
@@ -201,7 +202,7 @@
     }>;
     ```
 
-* 获取所有邀请的用户 matrix.updateShareUserInfo:
+* 获取所有邀请的用户 matrix.updateShareUserInfo (每个邀请用户的`config`项，相当于一个只有当前用户可见的，绑定在被邀请用户对象上的存档，可以用来维护类似于“每个邀请用户可以领xx钻石类似的功能”):
     ``` ts
     function getAllShareUsers<T>(): Promise<{
         last_page: boolean;
@@ -248,7 +249,6 @@
 ### 5. 数据统计
 
 * 游戏启动 matrix.BuriedPoint.onGameStart：
-
     ``` ts
     onGameStart(): Promise<{
         'page_stay_object_legal': boolean;
@@ -280,13 +280,13 @@
     }>
     ```
 
-* 进入某个场景 matrix.BuriedPoint.onEnterScene：
+* 进入某个场景 matrix.BuriedPoint.onEnterScene(`sceneName`需要与后台实现商定，若某场景前端没有事先定义，则传`'DEFAULT'`)：
 
     ``` ts
     onEnterScene(sceneName: string): void;
     ```
 
-* 离开某个场景 matrix.BuriedPoint.onLeaveScene
+* 离开某个场景 matrix.BuriedPoint.onLeaveScene(`sceneName`需要与后台实现商定):
 
     ``` ts
     onLeaveScene(sceneName: string): void;
@@ -298,19 +298,19 @@
     onAdVideoClose(scene: string, isEnd: boolean): void;
     ```
 
-* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger：
+* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger(`evnetName`事件名、`par1`事件参数1、`par2`事件参数2，需要与后台实现商定，目前暂时只支持两个参数，以后版本会增加)：
 
     ``` ts
-    onEventTrigger(evnetName: string, part1?: string | null, part2?: string | null, extra?: any): void;
+    onEventTrigger(evnetName: string, par1?: string | null, par2?: string | null, extra?: any): void;
     ```
 
-* 游戏盒子某个游戏被点击 matrix.BuriedPoint.onNavigateBoxItemClick:
+* 游戏盒子某个游戏被点击 matrix.BuriedPoint.onNavigateBoxItemClick（使用SDK获取的游戏抽屉中的项被点击时上报）:
 
     ``` ts
     onNavigateBoxItemClick(id: number);
     ```
 
-* 游戏盒子确认跳转某个消息 matrix.BuriedPoint.onNavigateBoxItemConfirm:
+* 游戏盒子确认跳转某个消息 matrix.BuriedPoint.onNavigateBoxItemConfirm（使用SDK获取的游戏抽屉中的项被确认跳转时上报）:
 
     ``` ts
     onNavigateBoxItemConfirm(id: number);
