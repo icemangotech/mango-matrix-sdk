@@ -28,7 +28,17 @@ namespace matrix {
     export function updateShareUserInfo<T>(userId: number, config: T): Promise<{
         config: T;
     }> {
-        return HttpRequest.post(`share/user/config/${userId}`, config)
+        return HttpRequest.post(`/share/user/config/${userId}`, config)
+            .then((res) => res.data);
+    }
+
+    export function getShareDoc(docKey): Promise<{
+        button_name: string;
+        id: string | null;
+        title: string;
+        image: string;
+    }> {
+        return HttpRequest.post(`/share/doc/${docKey}?v=2`)
             .then((res) => res.data);
     }
 }

@@ -53,6 +53,8 @@ namespace matrix {
     export type NAVIGATE_BOX_ITEM_TYPE = {
         id: number;
         pic: string;
+        icon: string;
+        name: string;
         appId: string,
         query: {
             [k: string]: any;

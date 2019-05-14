@@ -5,9 +5,11 @@ namespace matrix {
     export async function login<T, G>(): Promise<{
         server_time: number;
         sid: string;
-        user_data: USER_DATA_TYPE,
+        user_data: USER_DATA_TYPE;
         user_game_data: USER_GAME_DATA_TYPE<T>;
         game_config: G;
+        navigate: NAVIGATE_BOX_ITEM_TYPE;
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }> {
         const { code } = await wxLogin();
@@ -147,8 +149,8 @@ namespace matrix {
      * 获取用户数据
      */
     export async function getUserData<T>(): Promise<{
-        user_data: USER_DATA_TYPE,
-        user_game_data: USER_GAME_DATA_TYPE<T>,
+        user_data: USER_DATA_TYPE;
+        user_game_data: USER_GAME_DATA_TYPE<T>;
     }> {
         return HttpRequest.post('/user/data', {})
             .then((res) => {
@@ -160,9 +162,9 @@ namespace matrix {
      * 获取游戏配置
      */
     export async function getGameConfig<G>(): Promise<{
-        game_config: G,
-        navigate: NAVIGATE_BOX_ITEM_TYPE,
-        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>,
+        game_config: G;
+        navigate: NAVIGATE_BOX_ITEM_TYPE;
+        navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
     }> {
         return HttpRequest.post('/game/config', {})
             .then((res) => res.data);
@@ -173,9 +175,9 @@ namespace matrix {
      * @param extra
      */
     export async function submitExtra<T>(extra: T, returnUserGameData: number, score: number | null = null): Promise<{
-        user_game_data: USER_GAME_DATA_TYPE<T>,
-        new_record: boolean,
-        new_weekly_record: boolean,
+        user_game_data: USER_GAME_DATA_TYPE<T>;
+        new_record: boolean;
+        new_weekly_record: boolean;
     }> {
         return HttpRequest.post('/user/gamedata/extra', {
             extra,
@@ -188,9 +190,9 @@ namespace matrix {
      * 提交积分
      */
     export async function submitScore<T>(score: number): Promise<{
-        user_game_data: USER_GAME_DATA_TYPE<T>,
-        new_record: boolean,
-        new_weekly_record: boolean,
+        user_game_data: USER_GAME_DATA_TYPE<T>;
+        new_record: boolean;
+        new_weekly_record: boolean;
     }> {
         return HttpRequest.post('/user/gamedata/score', { score })
             .then(res => {

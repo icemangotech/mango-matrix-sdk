@@ -16,9 +16,14 @@ namespace matrix {
     export type EVENT_TYPE = Array<{
         key: string;
         time: number;
-        part1: string | null;
-        part2: string | null;
-        extra: any;
+        par1: any;
+        par2: any;
+        par3: any;
+        par4: any;
+        par5: any;
+        extra: {
+            [k: string]: any;
+        };
     }>;
 
     export type PAGE_TYPE = {
@@ -45,16 +50,10 @@ namespace matrix {
                 time: number;
             }>;
         };
-        event: Array<{
-            key: string;
-            time: number;
-            part1: string | null;
-            part2: string | null;
-            extra: any;
-        }>;
+        event: EVENT_TYPE;
         navigate: Array<{
             id: number;
-            type: 'click' | 'confirm',
+            type: 'click' | 'confirm';
             time: number;
         }>;
     };
@@ -75,7 +74,7 @@ namespace matrix {
 
         public static navigate: Array<{
             id: number;
-            type: 'click' | 'confirm',
+            type: 'click' | 'confirm';
             time: number;
         }> = [];
 
@@ -219,11 +218,16 @@ namespace matrix {
         // public static onAdVideoError(): void {
         // }
 
-        public static onEventTrigger(evnetName: string, part1: string | null = null, part2: string | null = null, extra: any = {}): void {
+        public static onEventTrigger(evnetName: string, par1: any = null, par2: any = null,
+                                    par3: any = null, par4: any = null, par5: any = null, 
+                                    extra: any = {}): void {
             this.events.push({
                 key: evnetName,
-                part1,
-                part2,
+                par1,
+                par2,
+                par3,
+                par4,
+                par5,
                 extra,
                 time: Date.now(),
             });
