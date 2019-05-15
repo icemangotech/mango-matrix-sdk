@@ -5,6 +5,7 @@ namespace matrix {
      * 初始化
      * @param host 请求主机名
      * @param rsaPublicKey rsa加密公钥
+     * @param rsaPublicKeyId rsa加密公钥ID
      * @param gameVersion 游戏版本号
      */
     export function init(host: string, rsaPublicKey: string, rsaPublicKeyId: string, gameVersion: string): void {

@@ -51,7 +51,7 @@ namespace matrix {
     }
 
     export type NAVIGATE_BOX_ITEM_TYPE = {
-        id: number;
+        id: string;
         pic: string;
         icon: string;
         name: string;

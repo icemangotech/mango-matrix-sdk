@@ -28,7 +28,13 @@ namespace matrix {
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
             wx.setStorageSync('sid', res.data.sid);
-            return res.data;
+            return {
+                ...res.data,
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                    ...item,
+                    id: String(item.id),
+                })),
+            };
         });
     }
 
@@ -84,10 +90,19 @@ namespace matrix {
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
             wx.setStorageSync('sid', res.data.sid);
-            return res.data;
+            return {
+                ...res.data,
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                    ...item,
+                    id: String(item.id),
+                })),
+            };
         });
     }
 
+    /**
+     * 获取用户信息
+     */
     export async function getUserInfo<T, G>(): Promise<{
         server_time: number;
         sid: string;
@@ -169,7 +184,13 @@ namespace matrix {
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
     }> {
         return HttpRequest.post('/game/config', {})
-            .then((res) => res.data);
+            .then((res) => ({
+                ...res.data,
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                    ...item,
+                    id: String(item.id),
+                })),
+            }));
     }
 
     /**

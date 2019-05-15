@@ -77,7 +77,7 @@
     跳转小游戏数据：
     ``` ts
     type NAVIGATE_BOX_ITEM_TYPE = {
-        id: number;
+        id: string;
         pic: string;
         icon: string;
         name: string;
@@ -298,7 +298,7 @@
     onAdVideoClose(scene: string, isEnd: boolean): void;
     ```
 
-* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger(`evnetName`事件名、`par1`事件参数1、`par2`事件参数2，需要与后台实现商定，目前暂时只支持两个参数，以后版本会增加)：
+* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger(`evnetName`事件名、`par1`事件参数1、`par2`事件参数2)：
 
     ``` ts
     onEventTrigger(evnetName: string, par1?: string | null, par2?: string | null, extra?: any): void;

@@ -32,6 +32,10 @@ namespace matrix {
             .then((res) => res.data);
     }
 
+    /**
+     * 根据分享文案的键名获取分享文案
+     * @param docKey 分享文案的键名
+     */
     export function getShareDoc(docKey): Promise<{
         button_name: string;
         id: string | null;
