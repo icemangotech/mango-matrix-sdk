@@ -14,10 +14,11 @@ namespace matrix {
         HttpRequest.publicKeyId = rsaPublicKeyId;
         HttpRequest.gameVersion = gameVersion;
 
-        wx.setStorageSync('share_id', egret.getOption('share_id'));
-        wx.setStorageSync('share_doc_id', egret.getOption('share_doc_id'));
-        wx.setStorageSync('channel_id', egret.getOption('channel_id'));
-        wx.setStorageSync('mango_tmpid', egret.getOption('mango_tmpid'));
+        const { query } = wx.getLaunchOptionsSync();
+        wx.setStorageSync('share_id', query.share_id);
+        wx.setStorageSync('share_doc_id', query.share_doc_id);
+        wx.setStorageSync('channel_id', query.channel_id);
+        wx.setStorageSync('mango_tmpid', query.mango_tmpid);
         wx.setStorageSync('sid', null);
     }
 }

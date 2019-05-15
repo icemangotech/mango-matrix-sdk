@@ -113,44 +113,41 @@ namespace matrix {
                 let postDataStr = this.unicodeEscape(JSON.stringify(postData));
                 postDataStr = HttpRequest.rsaEncrypt(postDataStr);
 
-                let request = new egret.HttpRequest();
-                request.responseType = egret.HttpResponseType.TEXT;
-                request.open(`${HttpRequest.host}${url}`, egret.HttpMethod.POST);
-                request.setRequestHeader("Content-Type", "application/json");
-                request.setRequestHeader("Rsa-Certificate-Id", HttpRequest.publicKeyId);
-
-                request.send(postDataStr);
-
-                request.addEventListener(egret.Event.COMPLETE, function (evt: egret.Event) {
-                    let res = <egret.HttpRequest>evt.currentTarget;
-                    const decryptedRes = HttpRequest.aesDecrypt(res.response, aesKey);
-
-                    if (!decryptedRes) {
+                wx.request({
+                    url: `${HttpRequest.host}${url}`,
+                    data: postData,
+                    header: {
+                        "Content-Type": "application/json",
+                        "Rsa-Certificate-Id": HttpRequest.publicKeyId,
+                    },
+                    method: 'POST',
+                    success: (res) => {
+                        const decryptedRes = HttpRequest.aesDecrypt(res.data, aesKey);
+                        if (!decryptedRes) {
+                            reject({
+                                code: 500,
+                                enmsg: 'Error on decrypt reponse',
+                                cnmsg: '解码错误',
+                                data: null,
+                            });
+                            return;
+                        }
+                        const data = JSON.parse(decryptedRes);
+                        if (data.code == 200 && data.enmsg == 'ok') {
+                            resolve(data);
+                        } else {
+                            reject(data);
+                        }
+                    },
+                    fail: () => {
                         reject({
                             code: 500,
-                            enmsg: 'Error on decrypt reponse',
-                            cnmsg: '解码错误',
+                            enmsg: 'Fail Network response',
+                            cnmsg: '网络错误',
                             data: null,
                         });
-                        return;
-                    }
-
-                    const data = JSON.parse(decryptedRes);
-                    if (data.code == 200 && data.enmsg == 'ok') {
-                        resolve(data);
-                    } else {
-                        reject(data);
-                    }
-                }, this);
-
-                request.addEventListener(egret.IOErrorEvent.IO_ERROR, function (evt: egret.IOErrorEvent) {
-                    reject({
-                        code: 500,
-                        enmsg: 'Fail Network response',
-                        cnmsg: '网络错误',
-                        data: null,
-                    });
-                }, this);
+                    },
+                });
             });
         }
     }
