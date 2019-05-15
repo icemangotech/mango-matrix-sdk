@@ -14,6 +14,8 @@ namespace matrix {
 
         public static publicKey: null | string = null;
 
+        public static publicKeyId: null | string = null;
+
         public static host: null | string = null;
 
         public static gameVersion: null | string = null;
@@ -115,7 +117,7 @@ namespace matrix {
                 request.responseType = egret.HttpResponseType.TEXT;
                 request.open(`${HttpRequest.host}${url}`, egret.HttpMethod.POST);
                 request.setRequestHeader("Content-Type", "application/json");
-                request.setRequestHeader("Rsa-Certificate-Id", "1");
+                request.setRequestHeader("Rsa-Certificate-Id", HttpRequest.publicKeyId);
 
                 request.send(postDataStr);
 

@@ -7,9 +7,10 @@ namespace matrix {
      * @param rsaPublicKey rsa加密公钥
      * @param gameVersion 游戏版本号
      */
-    export function init(host: string, rsaPublicKey: string, gameVersion: string): void {
+    export function init(host: string, rsaPublicKey: string, rsaPublicKeyId: string, gameVersion: string): void {
         HttpRequest.host = host;
         HttpRequest.publicKey = rsaPublicKey;
+        HttpRequest.publicKeyId = rsaPublicKeyId;
         HttpRequest.gameVersion = gameVersion;
 
         wx.setStorageSync('share_id', egret.getOption('share_id'));

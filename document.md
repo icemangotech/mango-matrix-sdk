@@ -11,11 +11,11 @@
 
 ### 2. 初始化
 
-* 与我方申请获取域名 `host` 和RSA加密公钥 `rsaPublicKey`；
+* 与我方申请获取域名 `host` 、RSA加密公钥 `rsaPublicKey`和公钥ID`rsaPublicKeyId`；
 
 * 在项目代码中添加初始化代码：
     ``` ts
-    function init(host: string, rsaPublicKey: string, gameVersion: string): void;
+    function init(host: string, rsaPublicKey: string, rsaPublicKeyId: string, gameVersion: string): void;
     ```
     确保 `matrix.init` 在其它方法前被调用。
 
