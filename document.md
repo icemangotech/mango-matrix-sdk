@@ -66,7 +66,7 @@
     用户游戏数据：
     ``` ts
     type USER_GAME_DATA_TYPE<T> = {
-        id: number,                         // 与user_data中的id相同
+        id: string,                         // 与user_data中的id相同
         share: USER_GAME_DATA_SHARE_TYPE,
         rank: USER_GAME_DATA_RANK_TYPE,
         extra: T,
@@ -298,22 +298,24 @@
     onAdVideoClose(scene: string, isEnd: boolean): void;
     ```
 
-* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger(`evnetName`事件名、`par1`事件参数1、`par2`事件参数2)：
+* 某个自定义的事件触发 matrix.BuriedPoint.onEventTrigger(`evnetName`事件名、`par1`事件参数1、`par2`事件参数2，……)：
 
     ``` ts
-    onEventTrigger(evnetName: string, par1?: string | null, par2?: string | null, extra?: any): void;
+    onEventTrigger(evnetName: string, par1?: string | null, par2?: string | null, 
+                    par3?: string | null, par4?: string | null,
+                    par5?: string | null, extra?: any): void;
     ```
 
 * 游戏盒子某个游戏被点击 matrix.BuriedPoint.onNavigateBoxItemClick（使用SDK获取的游戏抽屉中的项被点击时上报）:
 
     ``` ts
-    onNavigateBoxItemClick(id: number);
+    onNavigateBoxItemClick(id: string);
     ```
 
 * 游戏盒子确认跳转某个消息 matrix.BuriedPoint.onNavigateBoxItemConfirm（使用SDK获取的游戏抽屉中的项被确认跳转时上报）:
 
     ``` ts
-    onNavigateBoxItemConfirm(id: number);
+    onNavigateBoxItemConfirm(id: string);
     ```
 
 

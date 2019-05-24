@@ -115,7 +115,7 @@ namespace matrix {
 
                 wx.request({
                     url: `${HttpRequest.host}${url}`,
-                    data: postData,
+                    data: postDataStr,
                     header: {
                         "Content-Type": "application/json",
                         "Rsa-Certificate-Id": HttpRequest.publicKeyId,
