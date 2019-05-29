@@ -30,6 +30,7 @@ namespace matrix {
         time: number;
         duration: number;
         lastEnterTime: number;
+        active: boolean;
     };
 
     export type POST_DATA_TYPE = {
@@ -191,17 +192,20 @@ namespace matrix {
             if (sceneName in this.pages) {
                 this.pages[sceneName].lastEnterTime = Date.now();
                 this.pages[sceneName].time += 1;
+                this.pages[sceneName].active = true;
             } else {
                 this.pages[sceneName] = {
                     time: 1,
                     duration: 0,
                     lastEnterTime: Date.now(),
+                    active: true,
                 };
             }
         }
 
         public static onLeaveScene(sceneName: string): void {
-            if (sceneName in this.pages) {
+            if (sceneName in this.pages && this.pages[sceneName].active === true) {
+                this.pages[sceneName].active = false;
                 this.pages[sceneName].duration += Date.now() - this.pages[sceneName].lastEnterTime;
             }
         }
