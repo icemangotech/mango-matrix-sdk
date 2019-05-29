@@ -168,7 +168,11 @@ namespace matrix {
             const start_timestamp = this.lastTimestamp;
             const page_stay = {};
             for (let key in this.pages) {
-                page_stay[key] = [this.pages[key].time, this.pages[key].duration + Date.now() - this.pages[key].lastEnterTime];
+                if (this.pages[key].active) {
+                    page_stay[key] = [this.pages[key].time, this.pages[key].duration + current_timestamp - this.pages[key].lastEnterTime];
+                } else {
+                    page_stay[key] = [this.pages[key].time, this.pages[key].duration];
+                }
             }
             return {
                 current_timestamp,
