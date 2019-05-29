@@ -12,8 +12,7 @@
     "files": [
         "./libs/cryptojs.d.ts",
         "./libs/jsencrypt.d.ts",
-        "./libs/egret.d.ts",
-        "./libs/game.d.ts",
+        "./libs/LayaAir.d.ts",
         "./libs/wx.d.ts",
         "./src/data.ts",
         "./src/http.ts",

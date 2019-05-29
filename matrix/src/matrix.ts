@@ -1,6 +1,6 @@
 
 namespace matrix {
-    export const version: string = '1.0.0';
+    export const version: string = '1.0.1';
     /**
      * 初始化
      * @param host 请求主机名
@@ -14,12 +14,14 @@ namespace matrix {
         HttpRequest.publicKeyId = rsaPublicKeyId;
         HttpRequest.gameVersion = gameVersion;
 
-        const { query } = wx.getLaunchOptionsSync();
-        wx.setStorageSync('share_id', query.share_id);
-        wx.setStorageSync('share_doc_id', query.share_doc_id);
-        wx.setStorageSync('channel_id', query.channel_id);
-        wx.setStorageSync('mango_tmpid', query.mango_tmpid);
-        wx.setStorageSync('sid', null);
+        if (Laya.Browser.onWeiXin) {
+            const { query } = wx.getLaunchOptionsSync();
+            wx.setStorageSync('share_id', query.share_id);
+            wx.setStorageSync('share_doc_id', query.share_doc_id);
+            wx.setStorageSync('channel_id', query.channel_id);
+            wx.setStorageSync('mango_tmpid', query.mango_tmpid);
+            wx.setStorageSync('sid', null);
+        }
     }
 }
 

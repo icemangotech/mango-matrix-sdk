@@ -14,10 +14,16 @@ namespace matrix {
     }> {
         const { code } = await wxLogin();
         HttpRequest.auth = { code };
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (Laya.Browser.onWeiXin) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -27,7 +33,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (Laya.Browser.onWeiXin) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
@@ -45,14 +53,16 @@ namespace matrix {
         code: string;
     }> {
         return new Promise((resolve: (response: { code: string }) => any, reject: () => any) => {
-            wx.login({
-                success: (res) => {
-                    resolve({ ...res });
-                },
-                fail: () => {
-                    reject();
-                },
-            });
+            if (Laya.Browser.onWeiXin) {
+                wx.login({
+                    success: (res) => {
+                        resolve({ ...res });
+                    },
+                    fail: () => {
+                        reject();
+                    },
+                });
+            }
         });
     }
 
@@ -76,10 +86,16 @@ namespace matrix {
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }> {
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (Laya.Browser.onWeiXin) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -89,7 +105,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (Laya.Browser.onWeiXin) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
@@ -112,10 +130,16 @@ namespace matrix {
         platform_data: WMP_PLATFORM_DATA;
     }> {
         const { iv, encryptedData } = await wxGetUserInfo();
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (Laya.Browser.onWeiXin) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -128,7 +152,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (Laya.Browser.onWeiXin) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return res.data;
         });
     }
@@ -146,19 +172,21 @@ namespace matrix {
             ) => any,
             reject: () => any
         ) => {
-            wx.getUserInfo({
-                withCredentials: true,
-                lang: 'zh_CN',
-                success: (res) => {
-                    resolve({
-                        iv: res.iv,
-                        encryptedData: res.encryptedData,
-                    });
-                },
-                fail: () => {
-                    reject();
-                }
-            })
+            if (Laya.Browser.onWeiXin) {
+                wx.getUserInfo({
+                    withCredentials: true,
+                    lang: 'zh_CN',
+                    success: (res) => {
+                        resolve({
+                            iv: res.iv,
+                            encryptedData: res.encryptedData,
+                        });
+                    },
+                    fail: () => {
+                        reject();
+                    }
+                })
+            }
         });
     }
 

@@ -99,7 +99,10 @@ namespace matrix {
                 return;
             }
             const aesKey = HttpRequest.getAesEncryptKey();
-            const sid = wx.getStorageSync('sid');
+            let sid = null;
+            if (Laya.Browser.onWeiXin) {
+                sid = wx.getStorageSync('sid');
+            }
             return new Promise((resolve, reject) => {
                 const postData = {
                     rand: aesKey,
@@ -113,41 +116,43 @@ namespace matrix {
                 let postDataStr = this.unicodeEscape(JSON.stringify(postData));
                 postDataStr = HttpRequest.rsaEncrypt(postDataStr);
 
-                wx.request({
-                    url: `${HttpRequest.host}${url}`,
-                    data: postDataStr,
-                    header: {
-                        "Content-Type": "application/json",
-                        "Rsa-Certificate-Id": HttpRequest.publicKeyId,
-                    },
-                    method: 'POST',
-                    success: (res) => {
-                        const decryptedRes = HttpRequest.aesDecrypt(res.data, aesKey);
-                        if (!decryptedRes) {
+                if (Laya.Browser.onWeiXin) {
+                    wx.request({
+                        url: `${HttpRequest.host}${url}`,
+                        data: postDataStr,
+                        header: {
+                            "Content-Type": "application/json",
+                            "Rsa-Certificate-Id": HttpRequest.publicKeyId,
+                        },
+                        method: 'POST',
+                        success: (res) => {
+                            const decryptedRes = HttpRequest.aesDecrypt(res.data, aesKey);
+                            if (!decryptedRes) {
+                                reject({
+                                    code: 500,
+                                    enmsg: 'Error on decrypt reponse',
+                                    cnmsg: '解码错误',
+                                    data: null,
+                                });
+                                return;
+                            }
+                            const data = JSON.parse(decryptedRes);
+                            if (data.code == 200 && data.enmsg == 'ok') {
+                                resolve(data);
+                            } else {
+                                reject(data);
+                            }
+                        },
+                        fail: () => {
                             reject({
                                 code: 500,
-                                enmsg: 'Error on decrypt reponse',
-                                cnmsg: '解码错误',
+                                enmsg: 'Fail Network response',
+                                cnmsg: '网络错误',
                                 data: null,
                             });
-                            return;
-                        }
-                        const data = JSON.parse(decryptedRes);
-                        if (data.code == 200 && data.enmsg == 'ok') {
-                            resolve(data);
-                        } else {
-                            reject(data);
-                        }
-                    },
-                    fail: () => {
-                        reject({
-                            code: 500,
-                            enmsg: 'Fail Network response',
-                            cnmsg: '网络错误',
-                            data: null,
-                        });
-                    },
-                });
+                        },
+                    });
+                }
             });
         }
     }
