@@ -80,6 +80,8 @@ namespace matrix {
 
         private static timer: number | null = null;
 
+        private static currentScene: string | null = null;
+
         public static onGameStart(): Promise<{
             'page_stay_object_legal': boolean;
             'ad.banner_object_legal': boolean;
@@ -104,6 +106,7 @@ namespace matrix {
                     await HttpRequest.post('/app/heartbeat/tick', postData);
                     this.lastTimestamp = Date.now();
                     this.resetData();
+                    this.timer && clearTimeout(this.timer);
                     this.timer = this.onGameTick();
                 } catch(e) {
                     //
@@ -119,6 +122,7 @@ namespace matrix {
         }> {
             this.lastTimestamp = Date.now();
             const postData = this.getPostData();
+            this.timer && clearTimeout(this.timer);
             this.timer = this.onGameTick();
             return HttpRequest.post('/app/heartbeat/awake', postData)
                 .then((res) => {
@@ -153,6 +157,9 @@ namespace matrix {
             this.videos = [];
             this.events = [];
             this.navigate = [];
+            if (this.currentScene) {
+                this.onEnterScene(this.currentScene);
+            }
         }
 
         private static getPostData(): POST_DATA_TYPE {
@@ -179,6 +186,8 @@ namespace matrix {
         }
 
         public static onEnterScene(sceneName: string): void {
+            this.onLeaveScene(this.currentScene);
+            this.currentScene = sceneName;
             if (sceneName in this.pages) {
                 this.pages[sceneName].lastEnterTime = Date.now();
                 this.pages[sceneName].time += 1;
