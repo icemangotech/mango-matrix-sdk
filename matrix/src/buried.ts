@@ -89,13 +89,13 @@ namespace matrix {
             'ad.video_array_legal': boolean;
             'event_array_legal': boolean;
         }> {
-            this.lastTimestamp = Date.now();
             const postData = this.getPostData();
+            this.resetData();
+            this.lastTimestamp = Date.now();
+            this.timer && clearTimeout(this.timer);
             this.timer = this.onGameTick();
             return HttpRequest.post('/app/heartbeat/start', postData)
                 .then((res) => {
-                    this.resetData();
-                    this.lastTimestamp = Date.now();
                     return res.data;
                 });
         }
@@ -103,12 +103,12 @@ namespace matrix {
         private static onGameTick(): number {
             return setTimeout(async () => {
                 const postData = this.getPostData();
+                this.lastTimestamp = Date.now();
+                this.resetData();
+                this.timer && clearTimeout(this.timer);
+                this.timer = this.onGameTick();
                 try {
                     await HttpRequest.post('/app/heartbeat/tick', postData);
-                    this.lastTimestamp = Date.now();
-                    this.resetData();
-                    this.timer && clearTimeout(this.timer);
-                    this.timer = this.onGameTick();
                 } catch(e) {
                     //
                 }
@@ -123,12 +123,15 @@ namespace matrix {
         }> {
             this.lastTimestamp = Date.now();
             const postData = this.getPostData();
+            this.resetData();
             this.timer && clearTimeout(this.timer);
             this.timer = this.onGameTick();
+            this.lastTimestamp = Date.now();
+            if (this.currentScene) {
+                this.onEnterScene(this.currentScene);
+            }
             return HttpRequest.post('/app/heartbeat/awake', postData)
                 .then((res) => {
-                    this.resetData();
-                    this.lastTimestamp = Date.now();
                     return res.data;
                 })
         }
@@ -140,11 +143,11 @@ namespace matrix {
             'event_array_legal': boolean;
         }> {
             const postData = this.getPostData();
+            this.resetData();
+            this.lastTimestamp = Date.now();
             this.timer && clearTimeout(this.timer);
             return HttpRequest.post('/app/heartbeat/sleep', postData)
                 .then((res) => {
-                    this.resetData();
-                    this.lastTimestamp = Date.now();
                     return res.data;
                 })
         }
@@ -158,9 +161,6 @@ namespace matrix {
             this.videos = [];
             this.events = [];
             this.navigate = [];
-            if (this.currentScene) {
-                this.onEnterScene(this.currentScene);
-            }
         }
 
         private static getPostData(): POST_DATA_TYPE {
@@ -191,6 +191,9 @@ namespace matrix {
         }
 
         public static onEnterScene(sceneName: string): void {
+            if (!sceneName) {
+                return;
+            }
             this.onLeaveScene(this.currentScene);
             this.currentScene = sceneName;
             if (sceneName in this.pages) {
