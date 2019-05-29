@@ -9,6 +9,9 @@ namespace matrix {
      * @param gameVersion 游戏版本号
      */
     export function init(host: string, rsaPublicKey: string, rsaPublicKeyId: string, gameVersion: string): void {
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+            return;
+        }
         HttpRequest.host = host;
         HttpRequest.publicKey = rsaPublicKey;
         HttpRequest.publicKeyId = rsaPublicKeyId;

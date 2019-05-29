@@ -14,10 +14,16 @@ namespace matrix {
     }> {
         const { code } = await wxLogin();
         HttpRequest.auth = { code };
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -27,7 +33,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
@@ -45,6 +53,9 @@ namespace matrix {
         code: string;
     }> {
         return new Promise((resolve: (response: { code: string }) => any, reject: () => any) => {
+            if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+                reject();
+            }
             wx.login({
                 success: (res) => {
                     resolve({ ...res });
@@ -76,10 +87,16 @@ namespace matrix {
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
         platform_data: WMP_PLATFORM_DATA;
     }> {
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -89,7 +106,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
@@ -111,11 +130,17 @@ namespace matrix {
         game_config: G;
         platform_data: WMP_PLATFORM_DATA;
     }> {
+        let shareId = null;
+        let shareDocId = null;
+        let channelId = null;
+        let mangoTmpid = null;
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            shareId = wx.getStorageSync('share_id');
+            shareDocId = wx.getStorageSync('share_doc_id');
+            channelId = wx.getStorageSync('channel_id');
+            mangoTmpid = wx.getStorageSync('mango_tmpid');
+        }
         const { iv, encryptedData } = await wxGetUserInfo();
-        const shareId = wx.getStorageSync('share_id');
-        const shareDocId = wx.getStorageSync('share_doc_id');
-        const channelId = wx.getStorageSync('channel_id');
-        const mangoTmpid = wx.getStorageSync('mango_tmpid');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -128,7 +153,9 @@ namespace matrix {
             auth: HttpRequest.auth,
         }).then((res) => {
             HttpRequest.platformData = res.data.platform_data;
-            wx.setStorageSync('sid', res.data.sid);
+            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+                wx.setStorageSync('sid', res.data.sid);
+            }
             return res.data;
         });
     }
@@ -146,6 +173,9 @@ namespace matrix {
             ) => any,
             reject: () => any
         ) => {
+            if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+                reject();
+            }
             wx.getUserInfo({
                 withCredentials: true,
                 lang: 'zh_CN',

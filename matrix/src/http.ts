@@ -94,6 +94,16 @@ namespace matrix {
         };
 
         public static post(url: string, data?: {}): Promise<NetworkResponse> {
+            if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+                return new Promise((resolve, reject) => {
+                    reject({
+                        code: 500,
+                        enmsg: 'NOT WECHAT_GAME ENV',
+                        cnmsg: 'WECHAT_GAME',
+                        data: null,
+                    });
+                });
+            }
             if (HttpRequest.publicKey === null || HttpRequest.host === null) {
                 console.error('必须先调用init方法进行初始化');
                 return;
