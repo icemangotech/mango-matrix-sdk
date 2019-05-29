@@ -1,6 +1,6 @@
 
 namespace matrix {
-    export const version: string = '1.0.1';
+    export const version: string = '1.0.2';
     /**
      * 初始化
      * @param host 请求主机名
@@ -13,6 +13,8 @@ namespace matrix {
         HttpRequest.publicKey = rsaPublicKey;
         HttpRequest.publicKeyId = rsaPublicKeyId;
         HttpRequest.gameVersion = gameVersion;
+
+        BuriedPoint.lastTimestamp = Date.now();
 
         if (Laya.Browser.onWeiXin) {
             const { query } = wx.getLaunchOptionsSync();
