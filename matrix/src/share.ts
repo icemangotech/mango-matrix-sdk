@@ -36,7 +36,7 @@ namespace matrix {
      * 根据分享文案的键名获取分享文案
      * @param docKey 分享文案的键名
      */
-    export function getShareDoc(docKey: string): Promise<{
+    export function getShareDoc(docKey: string, isPrepare: boolean = false): Promise<{
         button_name: string;
         id: string | null;
         title: string;
@@ -46,7 +46,7 @@ namespace matrix {
             shareDocId: string;
         };
     }> {
-        return HttpRequest.post(`/share/doc/${docKey}?v=2`, {})
+        return HttpRequest.post(`/share/doc/${docKey}${isPrepare ? '/prepare' : ''}?v=2`, {})
             .then((res) => ({
                 ...res.data,
                 shareQuery: {
