@@ -46,7 +46,7 @@ namespace matrix {
             shareDocId: string;
         };
     }> {
-        return HttpRequest.post(`/share/doc/${docKey}?v=2`)
+        return HttpRequest.post(`/share/doc/${docKey}?v=2`, {})
             .then((res) => res.data);
     }
 }
