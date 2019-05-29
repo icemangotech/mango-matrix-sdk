@@ -89,7 +89,6 @@ namespace matrix {
             'ad.video_array_legal': boolean;
             'event_array_legal': boolean;
         }> {
-            this.lastTimestamp = Date.now();
             const postData = this.getPostData();
             this.resetData();
             this.lastTimestamp = Date.now();

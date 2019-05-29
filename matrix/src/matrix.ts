@@ -14,6 +14,8 @@ namespace matrix {
         HttpRequest.publicKeyId = rsaPublicKeyId;
         HttpRequest.gameVersion = gameVersion;
 
+        BuriedPoint.lastTimestamp = Date.now();
+
         const { query } = wx.getLaunchOptionsSync();
         wx.setStorageSync('share_id', query.share_id);
         wx.setStorageSync('share_doc_id', query.share_doc_id);
