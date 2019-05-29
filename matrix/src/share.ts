@@ -46,7 +46,13 @@ namespace matrix {
             shareDocId: string;
         };
     }> {
-        return HttpRequest.post(`/share/doc/${docKey}?v=2`)
-            .then((res) => res.data);
+        return HttpRequest.post(`/share/doc/${docKey}?v=2`, {})
+            .then((res) => ({
+                ...res.data,
+                shareQuery: {
+                    shareId: HttpRequest.platformData.openid,
+                    shareDocId: res.data.id,
+                },
+            }));
     }
 }
