@@ -243,6 +243,7 @@
         id: string | null;
         title: string;
         image: string;
+        shareQuery: string;
     }>;
     ```
 

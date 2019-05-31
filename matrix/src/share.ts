@@ -41,18 +41,12 @@ namespace matrix {
         id: string | null;
         title: string;
         image: string;
-        shareQuery: {
-            shareId: string;
-            shareDocId: string;
-        };
+        shareQuery: string;
     }> {
         return HttpRequest.post(`/share/doc/${docKey}${isPrepare ? '/prepare' : ''}?v=2`, {})
             .then((res) => ({
                 ...res.data,
-                shareQuery: {
-                    shareId: HttpRequest.platformData.openid,
-                    shareDocId: res.data.id,
-                },
+                shareQuery: `share_id=${HttpRequest.platformData.openid}&share_doc_id=${res.data.id}`,
             }));
     }
 }

@@ -18,17 +18,20 @@ namespace matrix {
         let shareDocId = null;
         let channelId = null;
         let mangoTmpid = null;
+        let scene = null;
         if (Laya.Browser.onWeiXin) {
             shareId = wx.getStorageSync('share_id');
             shareDocId = wx.getStorageSync('share_doc_id');
             channelId = wx.getStorageSync('channel_id');
             mangoTmpid = wx.getStorageSync('mango_tmpid');
+            scene = wx.getStorageSync('scene');
         }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: null,
             auth: HttpRequest.auth,
         }).then((res) => {
@@ -90,17 +93,20 @@ namespace matrix {
         let shareDocId = null;
         let channelId = null;
         let mangoTmpid = null;
+        let scene = null;
         if (Laya.Browser.onWeiXin) {
             shareId = wx.getStorageSync('share_id');
             shareDocId = wx.getStorageSync('share_doc_id');
             channelId = wx.getStorageSync('channel_id');
             mangoTmpid = wx.getStorageSync('mango_tmpid');
+            scene = wx.getStorageSync('scene');
         }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: info,
             auth: HttpRequest.auth,
         }).then((res) => {
@@ -134,17 +140,20 @@ namespace matrix {
         let shareDocId = null;
         let channelId = null;
         let mangoTmpid = null;
+        let scene = null;
         if (Laya.Browser.onWeiXin) {
             shareId = wx.getStorageSync('share_id');
             shareDocId = wx.getStorageSync('share_doc_id');
             channelId = wx.getStorageSync('channel_id');
             mangoTmpid = wx.getStorageSync('mango_tmpid');
+            scene = wx.getStorageSync('scene');
         }
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: {
                 iv,
                 encryptedData,
