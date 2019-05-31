@@ -18,11 +18,13 @@ namespace matrix {
         const shareDocId = wx.getStorageSync('share_doc_id');
         const channelId = wx.getStorageSync('channel_id');
         const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        const scene = wx.getStorageSync('scene');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: null,
             auth: HttpRequest.auth,
         }).then((res) => {
@@ -80,11 +82,13 @@ namespace matrix {
         const shareDocId = wx.getStorageSync('share_doc_id');
         const channelId = wx.getStorageSync('channel_id');
         const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        const scene = wx.getStorageSync('scene');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: info,
             auth: HttpRequest.auth,
         }).then((res) => {
@@ -116,11 +120,13 @@ namespace matrix {
         const shareDocId = wx.getStorageSync('share_doc_id');
         const channelId = wx.getStorageSync('channel_id');
         const mangoTmpid = wx.getStorageSync('mango_tmpid');
+        const scene = wx.getStorageSync('scene');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
             channel_id: channelId,
             mango_tmpid: mangoTmpid,
+            scene,
             info: {
                 iv,
                 encryptedData,

@@ -1,6 +1,6 @@
 
 namespace matrix {
-    export const version: string = '1.0.2';
+    export const version: string = '1.0.3';
     /**
      * 初始化
      * @param host 请求主机名
@@ -21,6 +21,7 @@ namespace matrix {
         wx.setStorageSync('share_doc_id', query.share_doc_id);
         wx.setStorageSync('channel_id', query.channel_id);
         wx.setStorageSync('mango_tmpid', query.mango_tmpid);
+        wx.setStorageSync('scene', query.scene);
         wx.setStorageSync('sid', null);
     }
 }
