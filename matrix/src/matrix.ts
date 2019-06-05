@@ -1,6 +1,6 @@
 
 namespace matrix {
-    export const version: string = '1.0.3';
+    export const version: string = '1.0.4';
     /**
      * 初始化
      * @param host 请求主机名
@@ -17,12 +17,12 @@ namespace matrix {
         BuriedPoint.lastTimestamp = Date.now();
 
         if (Laya.Browser.onWeiXin) {
-            const { query } = wx.getLaunchOptionsSync();
+            const { query, scene } = wx.getLaunchOptionsSync();
             wx.setStorageSync('share_id', query.share_id);
             wx.setStorageSync('share_doc_id', query.share_doc_id);
             wx.setStorageSync('channel_id', query.channel_id);
             wx.setStorageSync('mango_tmpid', query.mango_tmpid);
-            wx.setStorageSync('scene', query.scene);
+            wx.setStorageSync('scene', scene);
             wx.setStorageSync('sid', null);
 
             const {brand, model} =  wx.getSystemInfoSync();
