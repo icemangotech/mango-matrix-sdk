@@ -26,6 +26,10 @@ namespace matrix {
         wx.setStorageSync('mango_tmpid', query.mango_tmpid);
         wx.setStorageSync('scene', query.scene);
         wx.setStorageSync('sid', null);
+
+        const {brand, model} =  wx.getSystemInfoSync();
+        HttpRequest.brand = brand;
+        HttpRequest.model = model;
     }
 }
 
