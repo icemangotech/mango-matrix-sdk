@@ -10,6 +10,14 @@ namespace matrix {
         game_config: G;
         navigate: NAVIGATE_BOX_ITEM_TYPE;
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+        box_layout: {
+            highlight: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            category: Array<{
+                name: string;
+                icon: string;
+                list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            }>;
+        };
         platform_data: WMP_PLATFORM_DATA;
     }> {
         const { code } = await wxLogin();
@@ -32,10 +40,30 @@ namespace matrix {
             wx.setStorageSync('sid', res.data.sid);
             return {
                 ...res.data,
-                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
                     ...item,
                     id: String(item.id),
+                    query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
                 })),
+                box_layout: {
+                    highlight: res.data.box_layout.highlight.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        ...item,
+                        id: String(item.id),
+                        query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                    })),
+                    category: res.data.box_layout.category.map((c: {
+                        name: string;
+                        icon: string;
+                        list: Array<NAVIGATE_BOX_ITEM_RES_TYPE>;
+                    }) => ({
+                        ...c,
+                        list: c.list.map((item) => ({
+                            ...item,
+                            id: String(item.id),
+                            query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                        })),
+                    })),
+                },
             };
         });
     }
@@ -76,6 +104,14 @@ namespace matrix {
         game_config: G;
         navigate: NAVIGATE_BOX_ITEM_TYPE;
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+        box_layout: {
+            highlight: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            category: Array<{
+                name: string;
+                icon: string;
+                list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            }>;
+        };
         platform_data: WMP_PLATFORM_DATA;
     }> {
         const shareId = wx.getStorageSync('share_id');
@@ -96,10 +132,30 @@ namespace matrix {
             wx.setStorageSync('sid', res.data.sid);
             return {
                 ...res.data,
-                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
                     ...item,
                     id: String(item.id),
+                    query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
                 })),
+                box_layout: {
+                    highlight: res.data.box_layout.highlight.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        ...item,
+                        id: String(item.id),
+                        query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                    })),
+                    category: res.data.box_layout.category.map((c: {
+                        name: string;
+                        icon: string;
+                        list: Array<NAVIGATE_BOX_ITEM_RES_TYPE>;
+                    }) => ({
+                        ...c,
+                        list: c.list.map((item) => ({
+                            ...item,
+                            id: String(item.id),
+                            query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                        })),
+                    })),
+                },
             };
         });
     }
@@ -188,14 +244,42 @@ namespace matrix {
         game_config: G;
         navigate: NAVIGATE_BOX_ITEM_TYPE;
         navigate_list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+        box_layout: {
+            highlight: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            category: Array<{
+                name: string;
+                icon: string;
+                list: Array<NAVIGATE_BOX_ITEM_TYPE>;
+            }>;
+        };
     }> {
         return HttpRequest.post('/game/config', {})
             .then((res) => ({
                 ...res.data,
-                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_TYPE) => ({
+                navigate_list: res.data.navigate_list.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
                     ...item,
                     id: String(item.id),
+                    query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
                 })),
+                box_layout: {
+                    highlight: res.data.box_layout.highlight.map((item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        ...item,
+                        id: String(item.id),
+                        query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                    })),
+                    category: res.data.box_layout.category.map((c: {
+                        name: string;
+                        icon: string;
+                        list: Array<NAVIGATE_BOX_ITEM_RES_TYPE>;
+                    }) => ({
+                        ...c,
+                        list: c.list.map((item) => ({
+                            ...item,
+                            id: String(item.id),
+                            query: Object.keys(item.query).map((k) => `${k}=${item.query[k]}`).join('&'),
+                        })),
+                    })),
+                },
             }));
     }
 

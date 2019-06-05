@@ -56,11 +56,23 @@ namespace matrix {
         icon: string;
         name: string;
         appId: string,
+        query: string;
+        path: string;
+        extraData: any;
+        envVersion: string;
+    };
+
+    export type NAVIGATE_BOX_ITEM_RES_TYPE = {
+        id: string | number;
+        pic: string;
+        icon: string;
+        name: string;
+        appId: string,
         query: {
             [k: string]: any;
         };
         path: string;
         extraData: any;
         envVersion: string;
-    };
+    }
 }
