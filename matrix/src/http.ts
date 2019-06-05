@@ -22,6 +22,10 @@ namespace matrix {
 
         public static auth: null | WMP_AUTH = null;
 
+        public static brand: null | string = null;  // 设备品牌
+
+        public static model: null | string = null;  // 设备型号
+
         private static aesIv: string = '1234567890123456';
 
         public static platformData: WMP_PLATFORM_DATA = {
@@ -123,6 +127,8 @@ namespace matrix {
                         header: {
                             "Content-Type": "application/json",
                             "Rsa-Certificate-Id": HttpRequest.publicKeyId,
+                            "X-ClientInfo-Brand": HttpRequest.brand,
+                            "X-ClientInfo-Model": HttpRequest.model,
                         },
                         method: 'POST',
                         success: (res) => {
