@@ -74,5 +74,17 @@ namespace matrix {
         path: string;
         extraData: any;
         envVersion: string;
-    }
+    };
+
+    export type USER_IP_INFO_TYPE = {
+        ip: string;
+        country: string;
+        province: string;
+        city: string;
+        county: string;
+        isp: string;
+        zone_code: number;
+        longitude: number;
+        latitude: number;
+    };
 }

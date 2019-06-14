@@ -2,7 +2,7 @@
 
 namespace matrix {
     export type BANNER_TYPE = {
-        click: number;
+        show: number;
         showtime: number;
     };
 
@@ -40,10 +40,7 @@ namespace matrix {
             [k: string]: [number, number],
         };
         ad: {
-            banner: {
-                click: 0,
-                showtime: 0,
-            };
+            banner: BANNER_TYPE;
             video: Array<{
                 scene: string;
                 duration: number;
@@ -65,7 +62,7 @@ namespace matrix {
         public static pages: { [k: string]: PAGE_TYPE } = {};
 
         public static banner: BANNER_TYPE = {
-            click: 0,
+            show: 0,
             showtime: 0,
         };
 
@@ -154,8 +151,8 @@ namespace matrix {
 
         private static resetData(): void {
             this.pages = {};
-            this.banner  = {
-                click: 0,
+            this.banner = {
+                show: 0,
                 showtime: 0,
             };
             this.videos = [];
@@ -179,10 +176,7 @@ namespace matrix {
                 start_timestamp,
                 page_stay,
                 ad: {
-                    banner: {
-                        click: 0,
-                        showtime: 0,
-                    },
+                    banner: { ...this.banner },
                     video: [...this.videos],
                 },
                 event: [...this.events],
@@ -217,8 +211,9 @@ namespace matrix {
             }
         }
 
-        // public static onAdBannerShow(): void {
-        // }
+        public static onAdBannerShow(): void {
+            this.banner.show += 1;
+        }
 
         // public static onAdBannerClose(): void {
         // }
@@ -238,8 +233,8 @@ namespace matrix {
         // public static onAdVideoError(): void {
         // }
 
-        public static onEventTrigger(evnetName: string, par1: any = null, par2: any = null,
-                                    par3: any = null, par4: any = null, par5: any = null, 
+        public static onEventTrigger(evnetName: string, par1: any = undefined, par2: any = undefined,
+                                    par3: any = undefined, par4: any = undefined, par5: any = undefined,
                                     extra: any = {}): void {
             this.events.push({
                 key: evnetName,
