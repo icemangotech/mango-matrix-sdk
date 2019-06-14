@@ -19,6 +19,7 @@ namespace matrix {
             }>;
         };
         platform_data: WMP_PLATFORM_DATA;
+        ip_info: USER_IP_INFO_TYPE;
     }> {
         const { code } = await wxLogin();
         HttpRequest.auth = { code };
@@ -113,6 +114,7 @@ namespace matrix {
             }>;
         };
         platform_data: WMP_PLATFORM_DATA;
+        ip_info: USER_IP_INFO_TYPE;
     }> {
         const shareId = wx.getStorageSync('share_id');
         const shareDocId = wx.getStorageSync('share_doc_id');
@@ -252,6 +254,7 @@ namespace matrix {
                 list: Array<NAVIGATE_BOX_ITEM_TYPE>;
             }>;
         };
+        ip_info: USER_IP_INFO_TYPE;
     }> {
         return HttpRequest.post('/game/config', {})
             .then((res) => ({
