@@ -49,11 +49,6 @@ namespace matrix {
             }>;
         };
         event: EVENT_TYPE;
-        navigate: Array<{
-            id: number;
-            type: 'click' | 'confirm';
-            time: number;
-        }>;
     };
 
     export class BuriedPoint {
@@ -69,12 +64,6 @@ namespace matrix {
         public static videos: VIDEO_TYPE = [];
 
         public static events: EVENT_TYPE = [];
-
-        public static navigate: Array<{
-            id: number;
-            type: 'click' | 'confirm';
-            time: number;
-        }> = [];
 
         private static timer: number | null = null;
 
@@ -157,7 +146,6 @@ namespace matrix {
             };
             this.videos = [];
             this.events = [];
-            this.navigate = [];
         }
 
         private static getPostData(): POST_DATA_TYPE {
@@ -180,7 +168,6 @@ namespace matrix {
                     video: [...this.videos],
                 },
                 event: [...this.events],
-                navigate: [...this.navigate],
             };
         }
 
@@ -248,19 +235,16 @@ namespace matrix {
             });
         }
 
-        public static onNavigateBoxItemClick(id: number) {
-            this.navigate.push({
+        
+        public static onNavigateBoxItemClick(id: number): Promise<NetworkResponse> {
+            return HttpRequest.post('/app/navigate/report/click', {
                 id,
-                type: 'click',
-                time: Date.now(),
             });
         }
 
-        public static onNavigateBoxItemConfirm(id: number) {
-            this.navigate.push({
+        public static onNavigateBoxItemConfirm(id: number): Promise<NetworkResponse> {
+            return HttpRequest.post('/app/navigate/report/confirm', {
                 id,
-                type: 'confirm',
-                time: Date.now(),
             });
         }
     }
