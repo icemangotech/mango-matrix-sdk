@@ -1,45 +1,45 @@
 /// <reference path="http.ts" />
 
 namespace matrix {
-    export type BANNER_TYPE = {
+    type BANNER_TYPE = {
         show: number;
         showtime: number;
     };
 
-    export type VIDEO_TYPE = Array<{
+    type VIDEO_TYPE = {
         scene: string;
         duration: number;
         end: string;
         time: number;
-    }>;
+    };
 
-    export type EVENT_TYPE = Array<{
+    type EVENT_TYPE = {
         key: string;
         time: number;
-        par1: any;
-        par2: any;
-        par3: any;
-        par4: any;
-        par5: any;
+        par1?: string;
+        par2?: string;
+        par3?: string;
+        par4?: string;
+        par5?: string;
         extra: {
             [k: string]: any;
         };
-    }>;
+    };
 
-    export type PAGE_TYPE = {
+    type PAGE_TYPE = {
         time: number;
         duration: number;
         lastEnterTime: number;
         active: boolean;
     };
 
-    export type REQUEST_EVENT = {
+    type REQUEST_EVENT = {
         time: number;
         result: boolean;
         scene: string;
     };
 
-    export type POST_DATA_TYPE = {
+    type POST_DATA_TYPE = {
         current_timestamp: number;
         start_timestamp: number;
         page_stay: {
@@ -56,7 +56,7 @@ namespace matrix {
                 time: number;
             }>;
         };
-        event: EVENT_TYPE;
+        event: EVENT_TYPE[];
     };
 
     export class BuriedPoint {
@@ -70,10 +70,10 @@ namespace matrix {
         };
         private static bannerEvents: REQUEST_EVENT[] = [];
 
-        public static videos: VIDEO_TYPE = [];
+        public static videos: VIDEO_TYPE[] = [];
         private static videoIntentions: REQUEST_EVENT[] = [];
 
-        public static events: EVENT_TYPE = [];
+        public static events: EVENT_TYPE[] = [];
 
         private static timer: number | null = null;
 
@@ -242,19 +242,25 @@ namespace matrix {
         // public static onAdVideoError(): void {
         // }
 
-        public static onEventTrigger(evnetName: string, par1: any = undefined, par2: any = undefined,
-                                    par3: any = undefined, par4: any = undefined, par5: any = undefined,
+        public static onEventTrigger(eventName: string, par1: string = undefined, par2: string = undefined,
+                                    par3: string = undefined, par4: string = undefined, par5: string = undefined,
                                     extra: any = {}): void {
-            this.events.push({
-                key: evnetName,
+            const event: EVENT_TYPE = {
+                key: eventName,
                 par1,
                 par2,
                 par3,
                 par4,
                 par5,
                 extra,
-                time: Date.now(),
-            });
+                time: Date.now()
+            }
+            for (var key of Object.keys(event)) {
+                if (event[key] === undefined) {
+                    delete event[key]
+                }
+            }
+            this.events.push(event);
         }
 
         
