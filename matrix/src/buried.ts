@@ -33,6 +33,12 @@ namespace matrix {
         active: boolean;
     };
 
+    export type REQUEST_EVENT = {
+        time: number;
+        result: boolean;
+        scene: string;
+    };
+
     export type POST_DATA_TYPE = {
         current_timestamp: number;
         start_timestamp: number;
@@ -41,6 +47,8 @@ namespace matrix {
         };
         ad: {
             banner: BANNER_TYPE;
+            banner_event: REQUEST_EVENT[];
+            video_intention: REQUEST_EVENT[];
             video: Array<{
                 scene: string;
                 duration: number;
@@ -60,8 +68,10 @@ namespace matrix {
             show: 0,
             showtime: 0,
         };
+        private static bannerEvents: REQUEST_EVENT[] = [];
 
         public static videos: VIDEO_TYPE = [];
+        private static videoIntentions: REQUEST_EVENT[] = [];
 
         public static events: EVENT_TYPE = [];
 
@@ -146,6 +156,8 @@ namespace matrix {
             };
             this.videos = [];
             this.events = [];
+            this.bannerEvents = [];
+            this.videoIntentions = [];
         }
 
         private static getPostData(): POST_DATA_TYPE {
@@ -166,6 +178,8 @@ namespace matrix {
                 ad: {
                     banner: { ...this.banner },
                     video: [...this.videos],
+                    video_intention: [...this.videoIntentions],
+                    banner_event: [...this.bannerEvents]
                 },
                 event: [...this.events],
             };
@@ -198,12 +212,20 @@ namespace matrix {
             }
         }
 
+        public static onAdBannerRequest(sceneName: string, result: boolean) {
+            this.bannerEvents.push({scene: sceneName, result, time: Date.now()})
+        }
+
         public static onAdBannerShow(): void {
             this.banner.show += 1;
         }
 
         // public static onAdBannerClose(): void {
         // }
+
+        public static onAdVideoRequest(sceneName: string, result: boolean) {
+            this.videoIntentions.push({scene: sceneName, result, time: Date.now()})
+        }
 
         // public static onAdVideoShow(scene: string, duration: number): void {
         // }
