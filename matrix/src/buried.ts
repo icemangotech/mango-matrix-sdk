@@ -6,6 +6,11 @@ namespace matrix {
     showtime: number;
   };
 
+  type BANNER_SHOW_TYPE = {
+    scene: string;
+    time: number;
+  };
+
   type VIDEO_TYPE = {
     scene: string;
     duration: number;
@@ -21,7 +26,7 @@ namespace matrix {
     par3?: string;
     par4?: string;
     par5?: string;
-    extra: {
+    extra?: {
       [k: string]: any;
     };
   };
@@ -48,6 +53,7 @@ namespace matrix {
     ad: {
       banner: BANNER_TYPE;
       banner_event: REQUEST_EVENT[];
+      banner_show: BANNER_SHOW_TYPE[];
       video_intention: REQUEST_EVENT[];
       video: Array<{
         scene: string;
@@ -68,6 +74,7 @@ namespace matrix {
       show: 0,
       showtime: 0
     };
+    private static bannerShow: BANNER_SHOW_TYPE[] = [];
     private static bannerEvents: REQUEST_EVENT[] = [];
 
     private static videos: VIDEO_TYPE[] = [];
@@ -154,6 +161,7 @@ namespace matrix {
       this.videos = [];
       this.events = [];
       this.bannerEvents = [];
+      this.bannerShow = [];
       this.videoIntentions = [];
     }
 
@@ -181,7 +189,8 @@ namespace matrix {
           banner: { ...this.banner },
           video: [...this.videos],
           video_intention: [...this.videoIntentions],
-          banner_event: [...this.bannerEvents]
+          banner_event: [...this.bannerEvents],
+          banner_show: [...this.bannerShow]
         },
         event: [...this.events]
       };
@@ -219,8 +228,12 @@ namespace matrix {
       this.bannerEvents.push({ scene: sceneName, result, time: Date.now() });
     }
 
-    public static onAdBannerShow(): void {
+    public static onAdBannerShow(sceneName: string): void {
       this.banner.show += 1;
+      this.bannerShow.push({
+        scene: sceneName,
+        time: Date.now()
+      });
     }
 
     // public static onAdBannerClose(): void {
@@ -247,12 +260,12 @@ namespace matrix {
 
     public static onEventTrigger(
       eventName: string,
-      par1: string = undefined,
-      par2: string = undefined,
-      par3: string = undefined,
-      par4: string = undefined,
-      par5: string = undefined,
-      extra: any = {}
+      par1?: string,
+      par2?: string,
+      par3?: string,
+      par4?: string,
+      par5?: string,
+      extra?: any
     ): void {
       const event: EVENT_TYPE = {
         key: eventName,
