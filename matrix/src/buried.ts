@@ -285,14 +285,14 @@ namespace matrix {
       this.events.push(event);
     }
 
-    public static onNavigateBoxItemClick(id: number): Promise<NetworkResponse> {
+    public static onNavigateBoxItemClick(id: string): Promise<NetworkResponse> {
       return HttpRequest.post("/app/navigate/report/click", {
         id
       });
     }
 
     public static onNavigateBoxItemConfirm(
-      id: number
+      id: string
     ): Promise<NetworkResponse> {
       return HttpRequest.post("/app/navigate/report/confirm", {
         id
