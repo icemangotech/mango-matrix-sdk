@@ -278,7 +278,7 @@ namespace matrix {
      * @param {string} sceneName 场景名，默认传 "DEFAULT"
      * @param {boolean} result 请求结果
      */
-    public static onInterstitialAdRequest(sceneName: string, result: boolean) {
+    public static onAdInterstitialAdRequest(sceneName: string, result: boolean) {
       this.interstitialAdEvents.push({
         type: "INTENTION",
         scene: sceneName,
@@ -292,7 +292,7 @@ namespace matrix {
      *
      * @param {string} sceneName  场景名，默认传 "DEFAULT"
      */
-    public static onInterstitialAdShow(sceneName: string) {
+    public static onAdInterstitialShow(sceneName: string) {
       this.interstitialAdEvents.push({
         type: "SHOW",
         scene: sceneName,
