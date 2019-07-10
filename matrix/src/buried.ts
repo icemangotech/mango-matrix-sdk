@@ -44,6 +44,15 @@ namespace matrix {
     scene: string;
   };
 
+  type INTERSTITIAL_AD_EVENT =
+    | {
+        type: "INTENTION";
+        time: number;
+        scene: string;
+        result: boolean;
+      }
+    | { type: "SHOW"; time: number; scene: string };
+
   type POST_DATA_TYPE = {
     current_timestamp: number;
     start_timestamp: number;
@@ -61,6 +70,7 @@ namespace matrix {
         end: string;
         time: number;
       }>;
+      interstitial: INTERSTITIAL_AD_EVENT[];
     };
     event: EVENT_TYPE[];
   };
@@ -79,6 +89,8 @@ namespace matrix {
 
     private static videos: VIDEO_TYPE[] = [];
     private static videoIntentions: REQUEST_EVENT[] = [];
+
+    private static interstitialAdEvents: INTERSTITIAL_AD_EVENT[] = [];
 
     private static events: EVENT_TYPE[] = [];
 
@@ -163,6 +175,7 @@ namespace matrix {
       this.bannerEvents = [];
       this.bannerShow = [];
       this.videoIntentions = [];
+      this.interstitialAdEvents = [];
     }
 
     private static getPostData(): POST_DATA_TYPE {
@@ -190,7 +203,8 @@ namespace matrix {
           video: [...this.videos],
           video_intention: [...this.videoIntentions],
           banner_event: [...this.bannerEvents],
-          banner_show: [...this.bannerShow]
+          banner_show: [...this.bannerShow],
+          interstitial: [...this.interstitialAdEvents]
         },
         event: [...this.events]
       };
@@ -257,6 +271,34 @@ namespace matrix {
 
     // public static onAdVideoError(): void {
     // }
+
+    /**
+     * 插屏广告请求统计
+     *
+     * @param {string} sceneName 场景名，默认传 "DEFAULT"
+     * @param {boolean} result 请求结果
+     */
+    public static onInterstitialAdRequest(sceneName: string, result: boolean) {
+      this.interstitialAdEvents.push({
+        type: "INTENTION",
+        scene: sceneName,
+        time: Date.now(),
+        result
+      });
+    }
+
+    /**
+     * 插屏广告播放统计
+     *
+     * @param {string} sceneName  场景名，默认传 "DEFAULT"
+     */
+    public static onInterstitialAdShow(sceneName: string) {
+      this.interstitialAdEvents.push({
+        type: "SHOW",
+        scene: sceneName,
+        time: Date.now()
+      });
+    }
 
     public static onEventTrigger(
       eventName: string,
