@@ -1,6 +1,6 @@
 
 namespace matrix {
-    export const version: string = '1.2.0';
+    export const version: string = '1.2.1';
     /**
      * 初始化
      * @param host 请求主机名
