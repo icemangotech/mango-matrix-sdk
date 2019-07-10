@@ -1,9 +1,12 @@
-### Egret
+# Mango Matrix SDK
 
-1. 分别在cryptojs、jsencrypt和matrix文件夹执行
+芒果小游戏矩阵 SDK，提供数据获取、上报等功能。
 
-    ```
-    egret build
-    ```
+![](https://img.shields.io/github/release/icemangotech/mango-matrix-sdk.svg)
+![](https://img.shields.io/github/license/icemangotech/mango-matrix-sdk.svg)
 
-2. 使用对应目录下的bin文件夹作为白鹭的第三方库
+## 文档
+参见 [Wiki](https://github.com/icemangotech/mango-matrix-sdk/wiki)。
+
+## 使用
+从 [Release](https://github.com/icemangotech/mango-matrix-sdk/releases) 下载对应的包即可。
