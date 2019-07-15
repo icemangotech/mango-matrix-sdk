@@ -17,12 +17,18 @@
     "gulp-uglify": "^3.0.2",
     "gulp-watch": "^5.0.1",
     "gulp-wrap": "^0.15.0",
+    "prettier": "^1.18.2",
     "rollup": "^1.17.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify": "^6.0.2",
     "ts-loader": "^6.0.4",
     "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "jsencrypt": "^3.0.0-rc.1"
   }
 }
