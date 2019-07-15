@@ -2,11 +2,8 @@ import HttpRequest from './http';
 import BuriedPoint from './buried';
 import {
     WMP_PLATFORM_DATA,
-    WMP_AUTH,
     WMP_INFO,
     USER_DATA_TYPE,
-    USER_GAME_DATA_RANK_TYPE,
-    USER_GAME_DATA_SHARE_TYPE,
     USER_GAME_DATA_TYPE,
     USER_IP_INFO_TYPE,
     NAVIGATE_BOX_ITEM_RES_TYPE,
@@ -16,6 +13,16 @@ import {
 export default class Matrix {
     public static version = '2.0.0';
 
+    /**
+     * 预先与我方联系获取参数
+     *
+     * **必须首先调用**
+     *
+     * @param {string} host 域名
+     * @param {string} rsaPublicKey RSA 加密公钥
+     * @param {string} rsaPublicKeyId 公钥 ID
+     * @param {string} gameVersion 游戏版本
+     */
     public static init(
         host: string,
         rsaPublicKey: string,
@@ -78,6 +85,11 @@ export default class Matrix {
 
     // Share
 
+    /**
+     * 获取所有邀请的用户
+     *
+     * @template T 只有当前用户可见的，绑定在被邀请用户对象上的存档
+     */
     public static getAllShareUsers<T>(): Promise<{
         last_page: boolean;
         invite_count: number;
@@ -92,6 +104,12 @@ export default class Matrix {
         return HttpRequest.post('/share/users', {}).then(res => res.data);
     }
 
+    /**
+     * 获取单个被邀请用户的信息
+     *
+     * @template T 同 getAllShareUsers
+     * @param {number} userId 用户ID
+     */
     public static getShareUserInfo<T>(
         userId: number
     ): Promise<{
@@ -104,6 +122,13 @@ export default class Matrix {
         );
     }
 
+    /**
+     * 更新某个被邀请用户的 config
+     *
+     * @template T 同 getAllShareUsers
+     * @param {number} userId 用户 ID
+     * @param {T} config 新 config
+     */
     public static updateShareUserInfo<T>(
         userId: number,
         config: T
@@ -116,8 +141,14 @@ export default class Matrix {
     }
 
     /**
-     * 根据分享文案的键名获取分享文案
-     * @param docKey 分享文案的键名
+     * 获取指定键名对应的文案
+     *
+     * @param {string} docKey 键
+     * @param {boolean} [isPrepare=false]
+     * 接管微信右上角分享那里不能通过这种方式获取文案，所以，getShareDoc提供一个参数isPrepare，
+     * 默认值是false，当传入true的时候依然能够获取分享文案，但这个分享的请求就不作为统计项了。这
+     * 个可以用来在游戏启动时初始化获取文案，为用户的右上角分享做准备。除了右上角分享之外，都是需
+     * 要在拉起分享的前一刻通过SDK获取文案与图片
      */
     public static getShareDoc(
         docKey: string,
