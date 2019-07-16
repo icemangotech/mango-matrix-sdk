@@ -21,6 +21,7 @@
     "gulp-wrap": "^0.15.0",
     "prettier": "^1.18.2",
     "rollup": "^1.17.0",
+    "rollup-plugin-dts": "^1.1.5",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify": "^6.0.2",
