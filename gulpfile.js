@@ -74,7 +74,7 @@ function clean() {
     return gulp.src(['src/*.js', 'src/*.d.ts'], { read: false }).pipe(gulpClean())
 }
 
-const build = gulp.series(lint, assemble, license, compress, clean);
+const build = gulp.series(lint, assemble, compress, clean);
 
 exports.clean = clean;
 exports.build = build;

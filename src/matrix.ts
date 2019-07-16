@@ -10,8 +10,10 @@ import {
     NAVIGATE_BOX_ITEM_TYPE,
 } from './data';
 
+declare const MANGO_MATRIX_SDK_VERSION: string;
+
 export default class Matrix {
-    public static version = '2.0.0';
+    public static version = MANGO_MATRIX_SDK_VERSION;
 
     /**
      * 预先与我方联系获取参数

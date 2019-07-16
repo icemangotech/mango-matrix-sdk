@@ -8,7 +8,7 @@ const pkg = require('./package.json');
 var plugins = [
     resolve(),
     replace({
-        'JSENCRYPT_VERSION': JSON.stringify(pkg.version)
+        'MANGO_MATRIX_SDK_VERSION': JSON.stringify(pkg.version)
     })
 ];
 
