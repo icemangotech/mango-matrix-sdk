@@ -54,7 +54,7 @@ export default class Matrix {
     /**
      * 获取周排行榜
      */
-    public static getWoldWeekRank(): Promise<{
+    public static getWorldWeekRank(): Promise<{
         my_ranking: string;
         my_score: string;
         list: Array<{
@@ -70,7 +70,7 @@ export default class Matrix {
     /**
      * 获取总排行榜
      */
-    public static getWoldAllRank(): Promise<{
+    public static getWorldAllRank(): Promise<{
         my_ranking: string;
         my_score: string;
         list: Array<{
