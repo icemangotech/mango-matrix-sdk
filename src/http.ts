@@ -1,5 +1,6 @@
 import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
 import Matrix from './matrix';
+import CryptoJS from 'crypto-js'
 
 export interface NetworkResponse<T = any> {
     code: number;
@@ -32,6 +33,7 @@ export default class HttpRequest {
 
     public static rsaEncrypt(text: string): string {
         if (HttpRequest.publicKey === null) {
+            // tslint:disable-next-line: no-console
             console.error('必须先调用init方法进行初始化');
             return;
         }
@@ -106,6 +108,7 @@ export default class HttpRequest {
 
     public static post(url: string, data?: {}): Promise<NetworkResponse> {
         if (HttpRequest.publicKey === null || HttpRequest.host === null) {
+            // tslint:disable-next-line: no-console
             console.error('必须先调用init方法进行初始化');
             return;
         }

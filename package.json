@@ -6,6 +6,7 @@
   "repository": "git@github.com:icemangotech/mango-matrix-sdk.git",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/crypto-js": "^3.1.43",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-copy": "^4.0.1",

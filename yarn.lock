@@ -18,6 +18,11 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@types/crypto-js@^3.1.43":
+  version "3.1.43"
+  resolved "https://registry.npm.taobao.org/@types/crypto-js/download/@types/crypto-js-3.1.43.tgz#b859347d6289ba13e347c335a4c9efa63337a748"
+  integrity sha1-uFk0fWKJuhPjR8M1pMnvpjM3p0g=
+
 "@types/estree@0.0.39":
   version "0.0.39"
   resolved "https://registry.npm.taobao.org/@types/estree/download/@types/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
