@@ -15,6 +15,8 @@ declare const MANGO_MATRIX_SDK_VERSION: string;
 export default class Matrix {
     public static version = MANGO_MATRIX_SDK_VERSION;
 
+    public static BuriedPoint = BuriedPoint;
+
     /**
      * 预先与我方联系获取参数
      *

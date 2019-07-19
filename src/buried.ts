@@ -128,6 +128,7 @@ export default class BuriedPoint {
         }, 60000);
     }
 
+    // TODO: SID missing
     public static onGameAwake(): Promise<{
         page_stay_object_legal: boolean;
         'ad.banner_object_legal': boolean;

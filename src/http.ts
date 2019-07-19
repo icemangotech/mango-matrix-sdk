@@ -1,6 +1,8 @@
 import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
-import Matrix from './matrix';
-import CryptoJS from 'crypto-js'
+
+declare const CryptoJS: CryptoJS.Hashes
+
+declare const MANGO_MATRIX_SDK_VERSION: string;
 
 export interface NetworkResponse<T = any> {
     code: number;
@@ -121,7 +123,7 @@ export default class HttpRequest {
                 ua: 'wmp',
                 sid,
                 v: HttpRequest.gameVersion,
-                sv: Matrix.version,
+                sv: MANGO_MATRIX_SDK_VERSION,
                 data,
             };
             let postDataStr = this.unicodeEscape(JSON.stringify(postData));

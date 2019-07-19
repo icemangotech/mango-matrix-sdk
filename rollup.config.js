@@ -22,9 +22,8 @@ module.exports = [{
         file: pkg.main,
         format: 'umd',
         name: "matrix",
-        exports: "named"
+        exports: "named",
     },
-    external: ['crypto-js']
 }, {
     input: "./src/index.d.ts",
     output: {
