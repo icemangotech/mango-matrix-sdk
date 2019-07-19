@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Quick access to Mango Matrix",
   "main": "bin/matrix.js",
+  "types": "bin/matrix.d.ts",
   "repository": "git@github.com:icemangotech/mango-matrix-sdk.git",
   "license": "Apache-2.0",
   "devDependencies": {
