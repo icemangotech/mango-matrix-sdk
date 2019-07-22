@@ -1,6 +1,7 @@
 import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
+import Platform from './platform';
 
-declare const CryptoJS: CryptoJS.Hashes
+declare const CryptoJS: CryptoJS.Hashes;
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
 
@@ -33,7 +34,11 @@ export default class HttpRequest {
         openid: null,
     };
 
-    public static rsaEncrypt(text: string): string {
+    public static setSid(sid: string | null) {
+        Platform.setStorageItem('sid', sid);
+    }
+
+    private static rsaEncrypt(text: string): string {
         if (HttpRequest.publicKey === null) {
             // tslint:disable-next-line: no-console
             console.error('必须先调用init方法进行初始化');
@@ -53,7 +58,7 @@ export default class HttpRequest {
             .join('');
     }
 
-    public static getAesEncryptKey(): string {
+    private static getAesEncryptKey(): string {
         const keyLength = 16;
         const baseString =
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -65,8 +70,7 @@ export default class HttpRequest {
         return arr.join('');
     }
 
-    public static aesDecrypt(text: string, aesKey: string): string {
-
+    private static aesDecrypt(text: string, aesKey: string): string {
         const key = CryptoJS.enc.Latin1.parse(aesKey);
         const iv = CryptoJS.enc.Latin1.parse(HttpRequest.aesIv);
         return CryptoJS.AES.decrypt(text, key, {
@@ -81,7 +85,7 @@ export default class HttpRequest {
             .join('');
     }
 
-    public static unicodeEscape(str: string): string {
+    private static unicodeEscape(str: string): string {
         return str
             .split('')
             .map((char: string): string => {
@@ -100,11 +104,11 @@ export default class HttpRequest {
             .join('');
     }
 
-    public static unicodeCharEscape(charCode: number): string {
+    private static unicodeCharEscape(charCode: number): string {
         return '\\u' + HttpRequest.padWithLeadingZeros(charCode.toString(16));
     }
 
-    public static padWithLeadingZeros(str: string): string {
+    private static padWithLeadingZeros(str: string): string {
         return new Array(5 - str.length).join('0') + str;
     }
 
@@ -114,61 +118,50 @@ export default class HttpRequest {
             console.error('必须先调用init方法进行初始化');
             return;
         }
-        const aesKey = HttpRequest.getAesEncryptKey();
-        const sid = wx.getStorageSync('sid');
-        return new Promise((resolve, reject) => {
-            const postData = {
-                rand: aesKey,
-                timestamp: new Date().getTime(),
-                ua: 'wmp',
-                sid,
-                v: HttpRequest.gameVersion,
-                sv: MANGO_MATRIX_SDK_VERSION,
-                data,
-            };
-            let postDataStr = this.unicodeEscape(JSON.stringify(postData));
-            postDataStr = HttpRequest.rsaEncrypt(postDataStr);
+        const aesKey = this.getAesEncryptKey();
+        const sid = Platform.getStorageItem('sid');
 
-            wx.request({
-                url: `${HttpRequest.host}${url}`,
-                data: postDataStr,
-                header: {
-                    'Content-Type': 'application/json',
-                    'Rsa-Certificate-Id': HttpRequest.publicKeyId,
-                    'X-ClientInfo-Brand': HttpRequest.brand,
-                    'X-ClientInfo-Model': HttpRequest.model,
-                },
-                method: 'POST',
-                success: res => {
-                    const decryptedRes = HttpRequest.aesDecrypt(
-                        res.data,
-                        aesKey
-                    );
-                    if (!decryptedRes) {
-                        reject({
-                            code: 500,
-                            enmsg: 'Error on decrypt reponse',
-                            cnmsg: '解码错误',
-                            data: null,
-                        });
-                        return;
-                    }
-                    const response = JSON.parse(decryptedRes);
-                    if (response.code === 200 && response.enmsg === 'ok') {
-                        resolve(response);
-                    } else {
-                        reject(response);
-                    }
-                },
-                fail: () => {
-                    reject({
-                        code: 500,
-                        enmsg: 'Fail Network response',
-                        cnmsg: '网络错误',
-                        data: null,
-                    });
-                },
-            });
+        const header = {
+            'Content-Type': 'application/json',
+            'Rsa-Certificate-Id': HttpRequest.publicKeyId,
+            'X-ClientInfo-Brand': HttpRequest.brand,
+            'X-ClientInfo-Model': HttpRequest.model,
+        };
+
+        const postData = {
+            rand: aesKey,
+            timestamp: new Date().getTime(),
+            ua: Platform.Native === 'wx' ? 'wmp' : 'mp',
+            sid,
+            v: this.gameVersion,
+            sv: MANGO_MATRIX_SDK_VERSION,
+            data,
+        };
+        let postDataStr = this.unicodeEscape(JSON.stringify(postData));
+        postDataStr = this.rsaEncrypt(postDataStr);
+
+        const request = Platform.post(
+            `${this.host}${url}`,
+            header,
+            postDataStr
+        );
+
+        return request.then(cypher => {
+            const decryptedRes = this.aesDecrypt(cypher, aesKey);
+            if (!decryptedRes) {
+                return Promise.reject({
+                    code: 500,
+                    enmsg: 'Error on decrypt reponse',
+                    cnmsg: '解码错误',
+                    data: null,
+                });
+            }
+            const response = JSON.parse(decryptedRes);
+            if (response.code === 200 && response.enmsg === 'ok') {
+                return Promise.resolve(response);
+            } else {
+                return Promise.reject(response);
+            }
         });
     }
 }
