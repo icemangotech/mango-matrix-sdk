@@ -9,7 +9,7 @@ import {
     NAVIGATE_BOX_ITEM_RES_TYPE,
     NAVIGATE_BOX_ITEM_TYPE,
 } from './data';
-import Platform from './platform';
+import Environment from './environment';
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
 
@@ -40,17 +40,17 @@ export default class Matrix {
         HttpRequest.gameVersion = gameVersion;
 
         BuriedPoint.lastTimestamp = Date.now();
-        Platform.clearStorage();
-        const { query, scene } = Platform.getLaunchOptionsSync();
+        Environment.clearStorage();
+        const { query, scene } = Environment.getLaunchOptionsSync();
 
-        Platform.setStorageItem('share_id', query.share_id);
-        Platform.setStorageItem('share_doc_id', query.share_doc_id);
-        Platform.setStorageItem('channel_id', query.channel_id);
-        Platform.setStorageItem('mango_tmpid', query.mango_tmpid);
-        Platform.setStorageItem('scene', scene);
+        Environment.setStorageItem('share_id', query.share_id);
+        Environment.setStorageItem('share_doc_id', query.share_doc_id);
+        Environment.setStorageItem('channel_id', query.channel_id);
+        Environment.setStorageItem('mango_tmpid', query.mango_tmpid);
+        Environment.setStorageItem('scene', scene);
         HttpRequest.setSid(null);
 
-        const { brand, model } = Platform.getSystemInfoSync();
+        const { brand, model } = Environment.getSystemInfoSync();
         HttpRequest.brand = brand;
         HttpRequest.model = model;
     }
@@ -199,18 +199,18 @@ export default class Matrix {
         ip_info: USER_IP_INFO_TYPE;
     }> {
         let authCode = code;
-        if (Platform.Native === 'wx') {
+        if (Environment.platform === 'wx') {
             const wxResult = await this.wxLogin();
             authCode = wxResult.code;
         }
         HttpRequest.auth = { code: authCode };
-        const shareId = Platform.getStorageItem('share_id');
-        const shareDocId = Platform.getStorageItem('share_doc_id');
-        const channelId = Platform.getStorageItem('channel_id');
-        const mangoTmpid = Platform.getStorageItem('mango_tmpid');
-        const scene = Platform.getStorageItem('scene');
+        const shareId = Environment.getStorageItem('share_id');
+        const shareDocId = Environment.getStorageItem('share_doc_id');
+        const channelId = Environment.getStorageItem('channel_id');
+        const mangoTmpid = Environment.getStorageItem('mango_tmpid');
+        const scene = Environment.getStorageItem('scene');
         return HttpRequest.post(
-            `/user/auth/${Platform.Native === 'wx' ? 'wmp' : 'mp'}`,
+            `/user/auth/${Environment.platform === 'wx' ? 'wmp' : 'mp'}`,
             {
                 share_id: shareId,
                 share_doc_id: shareDocId,
@@ -321,11 +321,11 @@ export default class Matrix {
         platform_data: WMP_PLATFORM_DATA;
         ip_info: USER_IP_INFO_TYPE;
     }> {
-        const shareId = Platform.getStorageItem('share_id');
-        const shareDocId = Platform.getStorageItem('share_doc_id');
-        const channelId = Platform.getStorageItem('channel_id');
-        const mangoTmpid = Platform.getStorageItem('mango_tmpid');
-        const scene = Platform.getStorageItem('scene');
+        const shareId = Environment.getStorageItem('share_id');
+        const shareDocId = Environment.getStorageItem('share_doc_id');
+        const channelId = Environment.getStorageItem('channel_id');
+        const mangoTmpid = Environment.getStorageItem('mango_tmpid');
+        const scene = Environment.getStorageItem('scene');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,
@@ -392,15 +392,15 @@ export default class Matrix {
         game_config: G;
         platform_data: WMP_PLATFORM_DATA;
     }> {
-        if (Platform.Native !== 'wx') {
+        if (Environment.platform !== 'wx') {
             return Promise.reject('Not on WeChat');
         }
         const { iv, encryptedData } = await this.wxGetUserInfo();
-        const shareId = Platform.getStorageItem('share_id');
-        const shareDocId = Platform.getStorageItem('share_doc_id');
-        const channelId = Platform.getStorageItem('channel_id');
-        const mangoTmpid = Platform.getStorageItem('mango_tmpid');
-        const scene = Platform.getStorageItem('scene');
+        const shareId = Environment.getStorageItem('share_id');
+        const shareDocId = Environment.getStorageItem('share_doc_id');
+        const channelId = Environment.getStorageItem('channel_id');
+        const mangoTmpid = Environment.getStorageItem('mango_tmpid');
+        const scene = Environment.getStorageItem('scene');
         return HttpRequest.post('/user/auth/wmp', {
             share_id: shareId,
             share_doc_id: shareDocId,

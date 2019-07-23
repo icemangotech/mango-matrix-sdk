@@ -1,22 +1,39 @@
 import { querystring } from './querystringify';
 
-namespace Platform {
-    type PlatformNative = 'wx' | 'web';
+namespace Environment {
+    enum Engine {
+        None,
+        Egret,
+        Cocos,
+        Laya,
+    }
 
-    export const Native: PlatformNative = 'wx' in window ? 'wx' : 'web';
+    const checkGlobalModule = (name: string) => name in window;
+
+    export const engine: Engine = checkGlobalModule('egret')
+        ? Engine.Egret
+        : checkGlobalModule('cc')
+        ? Engine.Cocos
+        : checkGlobalModule('Laya')
+        ? Engine.Laya
+        : Engine.None;
+
+    type Platform = 'wx' | 'web';
+
+    export const platform: Platform = checkGlobalModule('wx') ? 'wx' : 'web';
 
     export function select<T>(
         platformSpecific: {
-            [platform in PlatformNative | 'default']?: T;
+            [plat in Platform | 'default']?: T;
         }
     ) {
-        return Native in platformSpecific
-            ? platformSpecific[Native]
+        return platform in platformSpecific
+            ? platformSpecific[platform]
             : platformSpecific.default;
     }
 
     export function getLaunchOptionsSync() {
-        switch (Native) {
+        switch (platform) {
             case 'wx':
                 return wx.getLaunchOptionsSync();
             default:
@@ -27,7 +44,7 @@ namespace Platform {
     }
 
     export function getSystemInfoSync() {
-        switch (Native) {
+        switch (platform) {
             case 'wx':
                 return wx.getSystemInfoSync();
             default:
@@ -43,7 +60,7 @@ namespace Platform {
         header: { [name: string]: string },
         postData: string
     ) {
-        switch (Native) {
+        switch (platform) {
             case 'wx':
                 return new Promise<string>((resolve, reject) => {
                     wx.request({
@@ -72,35 +89,20 @@ namespace Platform {
     }
 
     export function clearStorage() {
-        switch (Native) {
-            case 'wx':
-                wx.clearStorageSync();
-            default:
-                localStorage.clear();
-        }
+        localStorage.clear();
     }
 
     export function setStorageItem(key: string, value?: string | null) {
-        switch (Native) {
-            case 'wx':
-                wx.setStorageSync(key, value);
-            default:
-                if (value === null || value === undefined) {
-                    localStorage.removeItem(key);
-                } else {
-                    localStorage.setItem(key, value);
-                }
+        if (value === null || value === undefined) {
+            localStorage.removeItem(key);
+        } else {
+            localStorage.setItem(key, value);
         }
     }
 
     export function getStorageItem(key: string) {
-        switch (Native) {
-            case 'wx':
-                return wx.getStorageSync(key);
-            default:
-                return localStorage.getItem(key);
-        }
+        return localStorage.getItem(key);
     }
 }
 
-export default Platform;
+export default Environment;

@@ -1,5 +1,5 @@
 import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
-import Platform from './platform';
+import Environment from './environment';
 
 declare const CryptoJS: CryptoJS.Hashes;
 
@@ -35,7 +35,7 @@ export default class HttpRequest {
     };
 
     public static setSid(sid: string | null) {
-        Platform.setStorageItem('sid', sid);
+        Environment.setStorageItem('sid', sid);
     }
 
     private static rsaEncrypt(text: string): string {
@@ -119,7 +119,7 @@ export default class HttpRequest {
             return;
         }
         const aesKey = this.getAesEncryptKey();
-        const sid = Platform.getStorageItem('sid');
+        const sid = Environment.getStorageItem('sid');
 
         const header = {
             'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export default class HttpRequest {
         const postData = {
             rand: aesKey,
             timestamp: new Date().getTime(),
-            ua: Platform.Native === 'wx' ? 'wmp' : 'mp',
+            ua: Environment.platform === 'wx' ? 'wmp' : 'mp',
             sid,
             v: this.gameVersion,
             sv: MANGO_MATRIX_SDK_VERSION,
@@ -140,7 +140,7 @@ export default class HttpRequest {
         let postDataStr = this.unicodeEscape(JSON.stringify(postData));
         postDataStr = this.rsaEncrypt(postDataStr);
 
-        const request = Platform.post(
+        const request = Environment.post(
             `${this.host}${url}`,
             header,
             postDataStr
