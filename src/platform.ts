@@ -5,10 +5,14 @@ namespace Platform {
 
     export const Native: PlatformNative = 'wx' in window ? 'wx' : 'web';
 
-    export function select<T>(platformSpecific: {
-        [platform in PlatformNative | 'default']?: T
-    }) {
-        return Native in platformSpecific ? platformSpecific[Native]: platformSpecific.default
+    export function select<T>(
+        platformSpecific: {
+            [platform in PlatformNative | 'default']?: T;
+        }
+    ) {
+        return Native in platformSpecific
+            ? platformSpecific[Native]
+            : platformSpecific.default;
     }
 
     export function getLaunchOptionsSync() {
@@ -67,12 +71,21 @@ namespace Platform {
         }
     }
 
-    export function setStorageItem(key: string, value: string | null) {
+    export function clearStorage() {
+        switch (Native) {
+            case 'wx':
+                wx.clearStorageSync();
+            default:
+                localStorage.clear();
+        }
+    }
+
+    export function setStorageItem(key: string, value?: string | null) {
         switch (Native) {
             case 'wx':
                 wx.setStorageSync(key, value);
             default:
-                if (value === null) {
+                if (value === null || value === undefined) {
                     localStorage.removeItem(key);
                 } else {
                     localStorage.setItem(key, value);

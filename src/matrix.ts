@@ -40,14 +40,14 @@ export default class Matrix {
         HttpRequest.gameVersion = gameVersion;
 
         BuriedPoint.lastTimestamp = Date.now();
-
+        Platform.clearStorage();
         const { query, scene } = Platform.getLaunchOptionsSync();
 
         Platform.setStorageItem('share_id', query.share_id);
         Platform.setStorageItem('share_doc_id', query.share_doc_id);
         Platform.setStorageItem('channel_id', query.channel_id);
         Platform.setStorageItem('mango_tmpid', query.mango_tmpid);
-        Platform.setStorageItem('scene', `${scene}`);
+        Platform.setStorageItem('scene', scene);
         HttpRequest.setSid(null);
 
         const { brand, model } = Platform.getSystemInfoSync();
@@ -209,15 +209,18 @@ export default class Matrix {
         const channelId = Platform.getStorageItem('channel_id');
         const mangoTmpid = Platform.getStorageItem('mango_tmpid');
         const scene = Platform.getStorageItem('scene');
-        return HttpRequest.post('/user/auth/wmp', {
-            share_id: shareId,
-            share_doc_id: shareDocId,
-            channel_id: channelId,
-            mango_tmpid: mangoTmpid,
-            scene,
-            info: null,
-            auth: HttpRequest.auth,
-        }).then(res => {
+        return HttpRequest.post(
+            `/user/auth/${Platform.Native === 'wx' ? 'wmp' : 'mp'}`,
+            {
+                share_id: shareId,
+                share_doc_id: shareDocId,
+                channel_id: channelId,
+                mango_tmpid: mangoTmpid,
+                scene,
+                info: null,
+                auth: HttpRequest.auth,
+            }
+        ).then(res => {
             HttpRequest.platformData = res.data.platform_data;
             HttpRequest.setSid(res.data.sid);
             return {
@@ -390,7 +393,7 @@ export default class Matrix {
         platform_data: WMP_PLATFORM_DATA;
     }> {
         if (Platform.Native !== 'wx') {
-            return Promise.reject('Not on WeChat')
+            return Promise.reject('Not on WeChat');
         }
         const { iv, encryptedData } = await this.wxGetUserInfo();
         const shareId = Platform.getStorageItem('share_id');
