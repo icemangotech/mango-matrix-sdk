@@ -17,7 +17,6 @@ console.log(dts, typeof dts, Object.keys(dts))
 module.exports = [{
     input: "./src/index.js",
     plugins: plugins,
-    name: "matrix",
     output: {
         file: pkg.main,
         format: 'umd',
@@ -27,7 +26,7 @@ module.exports = [{
 }, {
     input: "./src/index.d.ts",
     output: {
-        file: "bin/matrix.d.ts",
+        file: pkg.types,
         format: "es",
     },
     plugins: [dts()]
