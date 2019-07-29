@@ -1,6 +1,6 @@
 {
   "name": "mango-matrix",
-  "version": "2.0.0",
+  "version": "2.0.0a",
   "description": "Quick access to Mango Matrix",
   "main": "bin/matrix.js",
   "types": "bin/matrix.d.ts",
