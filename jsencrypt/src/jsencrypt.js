@@ -2621,11 +2621,11 @@ function am3(i, x, w, j, c, n) {
     }
     return c;
 }
-if (j_lm && (navigator.appName == "Microsoft Internet Explorer")) {
+if (j_lm && (navigator && navigator.appName == "Microsoft Internet Explorer")) {
     BigInteger.prototype.am = am2;
     dbits = 30;
 }
-else if (j_lm && (navigator.appName != "Netscape")) {
+else if (j_lm && (navigator && navigator.appName != "Netscape")) {
     BigInteger.prototype.am = am1;
     dbits = 26;
 }
@@ -2751,7 +2751,7 @@ if (rng_pool == null) {
     rng_pool = [];
     rng_pptr = 0;
     var t = void 0;
-    if (window.crypto && window.crypto.getRandomValues) {
+    if (window && window.crypto && window.crypto.getRandomValues) {
         // Extract entropy (2048 bits) from RNG if available
         var z = new Uint32Array(256);
         window.crypto.getRandomValues(z);
@@ -2764,10 +2764,10 @@ if (rng_pool == null) {
     var onMouseMoveListener_1 = function (ev) {
         this.count = this.count || 0;
         if (this.count >= 256 || rng_pptr >= rng_psize) {
-            if (window.removeEventListener) {
+            if (window && window.removeEventListener) {
                 window.removeEventListener("mousemove", onMouseMoveListener_1, false);
             }
-            else if (window.detachEvent) {
+            else if (window && window.detachEvent) {
                 window.detachEvent("onmousemove", onMouseMoveListener_1);
             }
             return;
@@ -2781,10 +2781,10 @@ if (rng_pool == null) {
             // Sometimes Firefox will deny permission to access event properties for some reason. Ignore.
         }
     };
-    if (window.addEventListener) {
+    if (window && window.addEventListener) {
         window.addEventListener("mousemove", onMouseMoveListener_1, false);
     }
-    else if (window.attachEvent) {
+    else if (window && window.attachEvent) {
         window.attachEvent("onmousemove", onMouseMoveListener_1);
     }
 }
@@ -3241,7 +3241,7 @@ YAHOO.lang = {
             var _IEEnumFix = function() {},
                 ADD = ["toString", "valueOf"];
             try {
-                if (/MSIE/.test(navigator.userAgent)) {
+                if (navigator && /MSIE/.test(navigator.userAgent)) {
                     _IEEnumFix = function(r, s) {
                         for (i = 0; i < ADD.length; i = i + 1) {
                             var fname = ADD[i], f = s[fname];
