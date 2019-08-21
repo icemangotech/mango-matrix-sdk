@@ -114,7 +114,7 @@ export default class BuriedPoint {
     }
 
     private static onGameTick(): number {
-        return window.setTimeout(async () => {
+        return setTimeout(async () => {
             const postData = this.getPostData();
             this.lastTimestamp = Date.now();
             this.resetData();
@@ -125,7 +125,7 @@ export default class BuriedPoint {
             } catch (e) {
                 //
             }
-        }, 60000);
+        }, 60000) as any;
     }
 
     // TODO: SID missing
@@ -285,7 +285,7 @@ export default class BuriedPoint {
      * @param {string} sceneName 场景名，默认传 "DEFAULT"
      * @param {boolean} result 请求结果
      */
-    public static onAdInterstitialAdRequest(
+    public static onAdInterstitialRequest(
         sceneName: string,
         result: boolean
     ) {
