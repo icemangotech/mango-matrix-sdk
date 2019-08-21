@@ -1,7 +1,10 @@
 import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
 import Environment from './environment';
 
-declare const CryptoJS: CryptoJS.Hashes;
+// declare const CryptoJS: CryptoJS.Hashes;
+import encLatin1 from 'crypto-js/enc-latin1';
+import AES from 'crypto-js/aes';
+import JSEncrypt from 'jsencrypt';
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
 
@@ -71,11 +74,11 @@ export default class HttpRequest {
     }
 
     private static aesDecrypt(text: string, aesKey: string): string {
-        const key = CryptoJS.enc.Latin1.parse(aesKey);
-        const iv = CryptoJS.enc.Latin1.parse(HttpRequest.aesIv);
-        return CryptoJS.AES.decrypt(text, key, {
+        const key = encLatin1.parse(aesKey);
+        const iv = encLatin1.parse(HttpRequest.aesIv);
+        return AES.decrypt(text, key, {
             iv,
-            mode: CryptoJS.mode.CBC,
+            // mode: CryptoJS.mode.CBC,
         })
             .toString()
             .split(/(.{2})/)
