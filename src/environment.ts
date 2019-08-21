@@ -8,19 +8,17 @@ namespace Environment {
         Laya,
     }
 
-    const checkGlobalModule = (name: string) => name in window;
-
-    export const engine: Engine = checkGlobalModule('egret')
+    export const engine: Engine = egret
         ? Engine.Egret
-        : checkGlobalModule('cc')
+        : cc
         ? Engine.Cocos
-        : checkGlobalModule('Laya')
+        : Laya
         ? Engine.Laya
         : Engine.None;
 
     type Platform = 'wx' | 'web';
 
-    export const platform: Platform = checkGlobalModule('wx') ? 'wx' : 'web';
+    export const platform: Platform = wx ? 'wx' : 'web';
 
     export function select<T>(
         platformSpecific: {
@@ -36,7 +34,7 @@ namespace Environment {
         switch (platform) {
             case 'wx':
                 return wx.getLaunchOptionsSync();
-            default:
+            case 'web':
                 const url = window.location.href;
                 const query = url.split('?')[1];
                 return { query: querystring(query), scene: undefined };

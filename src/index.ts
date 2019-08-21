@@ -1,4 +1,6 @@
 import Matrix from './matrix';
-(window as any).Matrix = Matrix;
+if (window) {
+    (window as any).Matrix = Matrix;
+}
 export { Matrix };
 export default Matrix;
