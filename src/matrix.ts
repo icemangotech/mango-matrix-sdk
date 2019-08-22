@@ -1,5 +1,6 @@
 import HttpRequest from './http';
 import BuriedPoint from './buried';
+import Purchase from './purchase';
 import {
     WMP_PLATFORM_DATA,
     WMP_INFO,
@@ -15,6 +16,8 @@ declare const MANGO_MATRIX_SDK_VERSION: string;
 
 export default class Matrix {
     public static version = MANGO_MATRIX_SDK_VERSION;
+
+    public static Purchase = Purchase;
 
     public static BuriedPoint = BuriedPoint;
 
@@ -42,11 +45,14 @@ export default class Matrix {
         BuriedPoint.lastTimestamp = Date.now();
         Environment.clearStorage();
         const { query, scene } = Environment.getLaunchOptionsSync();
-
-        Environment.setStorageItem('share_id', query.share_id);
-        Environment.setStorageItem('share_doc_id', query.share_doc_id);
-        Environment.setStorageItem('channel_id', query.channel_id);
-        Environment.setStorageItem('mango_tmpid', query.mango_tmpid);
+        [
+            'share_id',
+            'share_doc_id',
+            'channel_id',
+            'mango_tmpid',
+        ].forEach(item => {
+            Environment.setStorageItem(item, query[item]);
+        });
         Environment.setStorageItem('scene', scene);
         HttpRequest.setSid(null);
 

@@ -18,7 +18,7 @@ function decode(input: string) {
  *
  * @param {string} query The query string that needs to be parsed.
  */
-export function querystring(query: string) {
+export function querystring(query: string): object {
     const parser = /([^=?&]+)=?([^&]*)/g;
     const result: {
         [key: string]: string;
