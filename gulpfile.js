@@ -12,7 +12,6 @@ var rollup = require('rollup');
 
 var lintFiles = [
     'src/*.ts',
-    'lib/*/**.ts'
 ];
 
 function lint() {
