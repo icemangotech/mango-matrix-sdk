@@ -115,7 +115,7 @@ export default class HttpRequest {
         return new Array(5 - str.length).join('0') + str;
     }
 
-    public static post(url: string, data?: {}): Promise<NetworkResponse> {
+    public static post<T = any>(url: string, data?: {}): Promise<NetworkResponse<T>> {
         if (HttpRequest.publicKey === null || HttpRequest.host === null) {
             // tslint:disable-next-line: no-console
             console.error('必须先调用init方法进行初始化');
