@@ -2872,7 +2872,7 @@ innerAudioContext.onError((res) => {
     /** 接口调用成功的回调函数 */
     success?: RenameSuccessCallback;
   }
-  interface RequestOption {
+  interface RequestOption<T> {
     /** 开发者服务器接口地址 */
     url: string;
     /** 接口调用结束的回调函数（调用成功、失败都会执行） */
@@ -2920,7 +2920,7 @@ innerAudioContext.onError((res) => {
      * 最低基础库： `1.7.0` */
     responseType?: 'text' | 'arraybuffer';
     /** 接口调用成功的回调函数 */
-    success?: RequestSuccessCallback;
+    success?: RequestSuccessCallback<T>;
   }
   interface RequestPaymentOption {
     /** 随机字符串，长度为32个字符以下 */
@@ -2944,9 +2944,9 @@ innerAudioContext.onError((res) => {
     /** 接口调用成功的回调函数 */
     success?: RequestPaymentSuccessCallback;
   }
-  interface RequestSuccessCallbackResult {
+  interface RequestSuccessCallbackResult<T> {
     /** 开发者服务器返回的数据 */
-    data: string | object | ArrayBuffer;
+    data: T;
     /** 开发者服务器返回的 HTTP Response Header
      *
      * 最低基础库： `1.2.0` */
@@ -7559,7 +7559,7 @@ wx.request({
   }
 })
 ``` */
-    request(option: RequestOption): RequestTask;
+    request<T = string>(option: RequestOption<T>): RequestTask;
     /** [[SelectorQuery](https://developers.weixin.qq.com/miniprogram/dev/api/wxml/SelectorQuery.html) wx.createSelectorQuery()](wx.createSelectorQuery.md)
 *
 * 返回一个 SelectorQuery 对象实例。
@@ -12097,7 +12097,7 @@ wx.writeBLECharacteristicValue({
   /** 接口调用成功的回调函数 */
   type RequestPaymentSuccessCallback = (res: GeneralCallbackResult) => void;
   /** 接口调用成功的回调函数 */
-  type RequestSuccessCallback = (result: RequestSuccessCallbackResult) => void;
+  type RequestSuccessCallback<T> = (result: RequestSuccessCallbackResult<T>) => void;
   /** HTTP Response Header 事件的回调函数 */
   type RequestTaskOffHeadersReceivedCallback = (
     res: GeneralCallbackResult,
