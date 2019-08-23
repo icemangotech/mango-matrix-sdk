@@ -126,7 +126,7 @@ export default class HttpRequest {
             return;
         }
         const aesKey = this.getAesEncryptKey();
-        const sid = Environment.getStorageItem('sid');
+        const sid = Environment.getStorageItem('sid') || null;
 
         const header = {
             'Content-Type': 'application/json',
