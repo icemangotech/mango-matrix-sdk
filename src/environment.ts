@@ -8,11 +8,16 @@ namespace Environment {
         Laya,
     }
 
-    export const engine: Engine = egret
+    const checkVariableInWindow = (name: string) => {
+        const globalWindow = window || {};
+        return globalWindow.hasOwnProperty(name);
+    };
+
+    export const engine: Engine = checkVariableInWindow('egret')
         ? Engine.Egret
-        : cc
+        : checkVariableInWindow('cc')
         ? Engine.Cocos
-        : Laya
+        : checkVariableInWindow('Laya')
         ? Engine.Laya
         : Engine.None;
 
@@ -78,6 +83,7 @@ namespace Environment {
                     });
                 });
             default:
+
                 return fetch(url, {
                     body: postData,
                     headers: header,
@@ -87,19 +93,27 @@ namespace Environment {
     }
 
     export function clearStorage() {
-        localStorage.clear();
-    }
-
-    export function setStorageItem(key: string, value?: string | null) {
-        if (value === null || value === undefined) {
-            localStorage.removeItem(key);
+        if (window && window.localStorage) {
+            window.localStorage.clear();
         } else {
-            localStorage.setItem(key, value);
+            wx.clearStorageSync();
         }
     }
 
-    export function getStorageItem(key: string) {
-        return localStorage.getItem(key);
+    export function setStorageItem(key: string, value?: string | null) {
+        if (window && window.localStorage) {
+            window.localStorage.setItem(key, value);
+        } else {
+            wx.setStorageSync(key, value);
+        }
+    }
+
+    export function getStorageItem(key: string): string {
+        if (window && window.localStorage) {
+            return window.localStorage.getItem(key);
+        } else {
+            return wx.getStorageSync(key);
+        }
     }
 }
 
