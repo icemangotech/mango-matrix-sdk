@@ -2,13 +2,13 @@ import HttpRequest from './http';
 import BuriedPoint from './buried';
 import Purchase, { PurchaseRestrict } from './purchase';
 import {
-    WMP_PLATFORM_DATA,
-    WMP_INFO,
-    USER_DATA_TYPE,
-    USER_GAME_DATA_TYPE,
-    USER_IP_INFO_TYPE,
-    NAVIGATE_BOX_ITEM_RES_TYPE,
-    NAVIGATE_BOX_ITEM_TYPE,
+    PlatformDataWmp,
+    LoginInfoWmp,
+    UserData,
+    UserGameData,
+    UserIpInfo,
+    NavigateBoxItemResponse,
+    NavigateBoxItem,
 } from './data';
 import Environment from './environment';
 import { PURCHASE_RESTRICT, IP_INFO } from './variables';
@@ -200,21 +200,21 @@ export default class Matrix {
     ): Promise<{
         server_time: number;
         sid: string;
-        user_data: USER_DATA_TYPE;
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_data: UserData;
+        user_game_data: UserGameData<T>;
         game_config: G;
-        navigate: NAVIGATE_BOX_ITEM_TYPE;
-        navigate_list: NAVIGATE_BOX_ITEM_TYPE[];
+        navigate: NavigateBoxItem;
+        navigate_list: NavigateBoxItem[];
         box_layout: {
-            highlight: NAVIGATE_BOX_ITEM_TYPE[];
+            highlight: NavigateBoxItem[];
             category: Array<{
                 name: string;
                 icon: string;
-                list: NAVIGATE_BOX_ITEM_TYPE[];
+                list: NavigateBoxItem[];
             }>;
         };
-        platform_data: WMP_PLATFORM_DATA;
-        ip_info: USER_IP_INFO_TYPE;
+        platform_data: PlatformDataWmp;
+        ip_info: UserIpInfo;
     }> {
         let authCode = code;
         if (Environment.platform === 'wx') {
@@ -239,7 +239,7 @@ export default class Matrix {
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map(
-                    (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                    (item: NavigateBoxItemResponse) => ({
                         ...item,
                         id: String(item.id),
                         query: Object.keys(item.query)
@@ -249,7 +249,7 @@ export default class Matrix {
                 ),
                 box_layout: {
                     highlight: res.data.box_layout.highlight.map(
-                        (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        (item: NavigateBoxItemResponse) => ({
                             ...item,
                             id: String(item.id),
                             query: Object.keys(item.query)
@@ -261,7 +261,7 @@ export default class Matrix {
                         (c: {
                             name: string;
                             icon: string;
-                            list: NAVIGATE_BOX_ITEM_RES_TYPE[];
+                            list: NavigateBoxItemResponse[];
                         }) => ({
                             ...c,
                             list: c.list.map(item => ({
@@ -304,7 +304,7 @@ export default class Matrix {
     /**
      * 获取 platform_data
      */
-    public static getPlatformData(): WMP_PLATFORM_DATA {
+    public static getPlatformData(): PlatformDataWmp {
         return HttpRequest.platformData;
     }
 
@@ -314,25 +314,25 @@ export default class Matrix {
      * @platform Wechat
      */
     public static async onAuth<T, G extends { purchase?: PurchaseRestrict }>(
-        info: WMP_INFO
+        info: LoginInfoWmp
     ): Promise<{
         server_time: number;
         sid: string;
-        user_data: USER_DATA_TYPE;
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_data: UserData;
+        user_game_data: UserGameData<T>;
         game_config: G;
-        navigate: NAVIGATE_BOX_ITEM_TYPE;
-        navigate_list: NAVIGATE_BOX_ITEM_TYPE[];
+        navigate: NavigateBoxItem;
+        navigate_list: NavigateBoxItem[];
         box_layout: {
-            highlight: NAVIGATE_BOX_ITEM_TYPE[];
+            highlight: NavigateBoxItem[];
             category: Array<{
                 name: string;
                 icon: string;
-                list: NAVIGATE_BOX_ITEM_TYPE[];
+                list: NavigateBoxItem[];
             }>;
         };
-        platform_data: WMP_PLATFORM_DATA;
-        ip_info: USER_IP_INFO_TYPE;
+        platform_data: PlatformDataWmp;
+        ip_info: UserIpInfo;
     }> {
         return HttpRequest.post('/user/auth/wmp', {
             ...this.getAuthData(),
@@ -348,7 +348,7 @@ export default class Matrix {
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map(
-                    (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                    (item: NavigateBoxItemResponse) => ({
                         ...item,
                         id: String(item.id),
                         query: Object.keys(item.query)
@@ -358,7 +358,7 @@ export default class Matrix {
                 ),
                 box_layout: {
                     highlight: res.data.box_layout.highlight.map(
-                        (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        (item: NavigateBoxItemResponse) => ({
                             ...item,
                             id: String(item.id),
                             query: Object.keys(item.query)
@@ -370,7 +370,7 @@ export default class Matrix {
                         (c: {
                             name: string;
                             icon: string;
-                            list: NAVIGATE_BOX_ITEM_RES_TYPE[];
+                            list: NavigateBoxItemResponse[];
                         }) => ({
                             ...c,
                             list: c.list.map(item => ({
@@ -398,10 +398,10 @@ export default class Matrix {
     >(): Promise<{
         server_time: number;
         sid: string;
-        user_data: USER_DATA_TYPE;
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_data: UserData;
+        user_game_data: UserGameData<T>;
         game_config: G;
-        platform_data: WMP_PLATFORM_DATA;
+        platform_data: PlatformDataWmp;
     }> {
         if (Environment.platform !== 'wx') {
             return Promise.reject('Not on WeChat');
@@ -458,8 +458,8 @@ export default class Matrix {
      * 获取用户数据
      */
     public static async getUserData<T>(): Promise<{
-        user_data: USER_DATA_TYPE;
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_data: UserData;
+        user_game_data: UserGameData<T>;
     }> {
         return HttpRequest.post('/user/data', {}).then(res => {
             return res.data;
@@ -473,17 +473,17 @@ export default class Matrix {
         G extends { purchase?: PurchaseRestrict }
     >(): Promise<{
         game_config: G;
-        navigate: NAVIGATE_BOX_ITEM_TYPE;
-        navigate_list: NAVIGATE_BOX_ITEM_TYPE[];
+        navigate: NavigateBoxItem;
+        navigate_list: NavigateBoxItem[];
         box_layout: {
-            highlight: NAVIGATE_BOX_ITEM_TYPE[];
+            highlight: NavigateBoxItem[];
             category: Array<{
                 name: string;
                 icon: string;
-                list: NAVIGATE_BOX_ITEM_TYPE[];
+                list: NavigateBoxItem[];
             }>;
         };
-        ip_info: USER_IP_INFO_TYPE;
+        ip_info: UserIpInfo;
     }> {
         return HttpRequest.post('/game/config', {}).then(res => {
             this.savePurchaseInfo(
@@ -493,7 +493,7 @@ export default class Matrix {
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map(
-                    (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                    (item: NavigateBoxItemResponse) => ({
                         ...item,
                         id: String(item.id),
                         query: Object.keys(item.query)
@@ -503,7 +503,7 @@ export default class Matrix {
                 ),
                 box_layout: {
                     highlight: res.data.box_layout.highlight.map(
-                        (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
+                        (item: NavigateBoxItemResponse) => ({
                             ...item,
                             id: String(item.id),
                             query: Object.keys(item.query)
@@ -515,7 +515,7 @@ export default class Matrix {
                         (c: {
                             name: string;
                             icon: string;
-                            list: NAVIGATE_BOX_ITEM_RES_TYPE[];
+                            list: NavigateBoxItemResponse[];
                         }) => ({
                             ...c,
                             list: c.list.map(item => ({
@@ -541,7 +541,7 @@ export default class Matrix {
         returnUserGameData: number,
         score: number | null = null
     ): Promise<{
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_game_data: UserGameData<T>;
         new_record: boolean;
         new_weekly_record: boolean;
     }> {
@@ -558,7 +558,7 @@ export default class Matrix {
     public static async submitScore<T>(
         score: number
     ): Promise<{
-        user_game_data: USER_GAME_DATA_TYPE<T>;
+        user_game_data: UserGameData<T>;
         new_record: boolean;
         new_weekly_record: boolean;
     }> {
@@ -569,7 +569,7 @@ export default class Matrix {
 
     private static savePurchaseInfo(
         purchase?: PurchaseRestrict,
-        ipInfo?: USER_IP_INFO_TYPE
+        ipInfo?: UserIpInfo
     ) {
         if (purchase) {
             const str = JSON.stringify(purchase);

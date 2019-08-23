@@ -1,5 +1,5 @@
 import HttpRequest from './http';
-import { USER_GAME_DATA_TYPE, USER_IP_INFO_TYPE } from './data';
+import { UserGameData, UserIpInfo } from './data';
 import Environment from './environment';
 import { PURCHASE_RESTRICT, IP_INFO } from './variables';
 
@@ -142,7 +142,7 @@ export default class Purchase {
         HttpRequest.post<{
             /** 为true表示更改标记成功，为false表示该订单已为“已处理”状态 */
             success: boolean;
-            user_game_data?: USER_GAME_DATA_TYPE<T>;
+            user_game_data?: UserGameData<T>;
         }>('/shop/order/settle', {
             ...param,
         }).then(res => res.data);
@@ -171,7 +171,7 @@ export default class Purchase {
         const restrict: PurchaseRestrict | null = JSON.parse(
             Environment.getStorageItem(PURCHASE_RESTRICT) || 'null'
         );
-        const ipInfo: USER_IP_INFO_TYPE | null = JSON.parse(
+        const ipInfo: UserIpInfo | null = JSON.parse(
             Environment.getStorageItem(IP_INFO) || 'null'
         );
         if (restrict && ipInfo) {

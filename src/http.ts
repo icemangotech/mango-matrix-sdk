@@ -1,4 +1,4 @@
-import { WMP_AUTH, WMP_PLATFORM_DATA } from './data';
+import { PlatformDataWmp } from './data';
 import Environment from './environment';
 
 // declare const CryptoJS: CryptoJS.Hashes;
@@ -7,6 +7,10 @@ import AES from 'crypto-js/aes';
 import JSEncrypt from 'jsencrypt';
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
+
+interface LoginAuthWmp {
+    code: string
+}
 
 export interface NetworkResponse<T = any> {
     code: number;
@@ -25,7 +29,7 @@ export default class HttpRequest {
 
     public static gameVersion: null | string = null;
 
-    public static auth: null | WMP_AUTH = null;
+    public static auth: null | LoginAuthWmp = null;
 
     public static brand: null | string = null; // 设备品牌
 
@@ -33,7 +37,7 @@ export default class HttpRequest {
 
     private static aesIv: string = '1234567890123456';
 
-    public static platformData: WMP_PLATFORM_DATA = {
+    public static platformData: PlatformDataWmp = {
         openid: null,
     };
 
