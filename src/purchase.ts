@@ -2,13 +2,37 @@ import HttpRequest from './http';
 import { USER_GAME_DATA_TYPE } from './data';
 import Environment from './environment';
 
+/**
+ * 键为支付项目，值为具体的描述
+ */
 export interface Goods {
-    [itemName: string]:
-        | { type: 'fixed'; price: number }
-        | { type: 'variable'; prices: number[]; par: string[] };
+    [key: string]:
+        | {
+              /** 固定价格 */
+              type: 'fixed';
+              /** 价格，单位为分 */
+              price: number;
+          }
+        | {
+              /** 可变价格 */
+              type: 'variable';
+              /** 价格，单位为分 */
+              prices: number[];
+              /** 档位 */
+              par: string[];
+          };
 }
 
-export type PrePayParams = { id: any; price: number } & (
+export type PreOrderParams = { id: any; price: number; cp_id?: string } & (
+    | {
+          type: 'web';
+          params: {
+              /** 跳转地址，若当前环境无法直接拉起公众号支付，该项为需要跳转到的地址 */
+              url: string;
+              /** 跳转地址的二维码图片地址 */
+              url_qr_code: string;
+          };
+      }
     | {
           type: 'wmp';
           params: {
@@ -19,69 +43,107 @@ export type PrePayParams = { id: any; price: number } & (
               paySign: string;
               appId: string;
           };
-      }
-    | {
-          type: 'badam';
-          params: {
-              goods_name: string;
-              user_data: string;
-              ts: string;
-              sign: string;
-          };
       });
 
 export default class Purchase {
+    /**
+     * 获取商品列表
+     * @param key 与后台事先约定的项目名，为空则返回全部商品
+     */
     public static fetchGoodsList = (key: string = '') =>
         HttpRequest.post<{ goods: Goods }>(`/shop/goods/${key}`).then(
             res => res.data
         );
 
-    public static onPreorder = (key: string, par?: string, channel?: any) =>
-        HttpRequest.post<PrePayParams>(`/shop/order/add/${key}/${par}`, {
+    /**
+     * 预下单，该接口会自动调起微信小程序支付，返回支付结果
+     * @param key 为与后台事先约定的支付项目，如vip、gold(金币)等
+     * @param par 为与后台事先约定的订单参数，若无par则缺省
+     * @param cpId 开发者指定的订单号，可以缺省
+     * @param channel 支付通道id，该项暂时缺省
+     */
+    public static onPreOrder = (
+        key: string,
+        par?: string,
+        cpId?: string,
+        channel?: any
+    ) =>
+        HttpRequest.post<PreOrderParams>(`/shop/order/add/${key}/${par}`, {
             channel,
+            cp_id: cpId,
         }).then(res => {
             if (res.data.type === 'wmp' && Environment.platform === 'wx') {
                 const { params } = res.data;
-                return new Promise<wx.GeneralCallbackResult>(
-                    (resolve, reject) => {
-                        wx.requestPayment({
-                            ...params,
-                            signType: params.signType as any,
-                            success: result => {
-                                resolve(result);
-                            },
-                            fail: err => {
-                                reject(Error(err.errMsg));
-                            },
-                        });
-                    }
-                );
+                return new Promise<PreOrderParams>((resolve, reject) => {
+                    wx.requestPayment({
+                        ...params,
+                        signType: params.signType as any,
+                        success: result => {
+                            resolve(res.data);
+                        },
+                        fail: err => {
+                            reject(Error(err.errMsg));
+                        },
+                    });
+                });
+            } else if (res.data.type === 'web') {
+                return res.data;
             } else {
-                // TODO: handle 'badam' type
                 return Promise.reject(Error('Payment not supported.'));
             }
         });
 
-    public static queryOrderStatus = (id: any) =>
-        HttpRequest.post<{
-            status: 0 | 1 | 2;
-            settled: boolean;
-        }>('/shop/order/query', { id }).then(res => res.data);
-
-    public static settleOrder = <T>(
-        id: any,
-        extra: T,
-        returnUserGameData: number
+    /**
+     * @param param.id 订单 ID
+     * @param param.cp_id cpID
+     */
+    public static queryOrderStatus = (
+        param:
+            | {
+                  id: any;
+                  cp_id?: never;
+              }
+            | {
+                  id?: never;
+                  cp_id: string;
+              }
     ) =>
         HttpRequest.post<{
+            /** 0处理中或失败，1支付成功，2已退款 */
+            status: 0 | 1 | 2;
+            settled: boolean;
+        }>('/shop/order/query', { ...param }).then(res => res.data);
+
+    /**
+     * 把某个订单标记为“已处理”
+     * @param param.id 订单ID
+     * @param param.cp_id cpID
+     * @param param.extra 同 Matrix.submitExtra
+     * @param param.return_user_game_data 为 0 时返回值不含 `user_game_data` ，减轻服务器压力
+     */
+    public static settleOrder = <T>(
+        param: { extra: T; return_user_game_data: 0 | 1 } & (
+            | {
+                  id: any;
+                  cp_id?: never;
+              }
+            | {
+                  id?: never;
+                  cp_id: string;
+              })
+    ) =>
+        HttpRequest.post<{
+            /** 为true表示更改标记成功，为false表示该订单已为“已处理”状态 */
             success: boolean;
-            user_game_data: USER_GAME_DATA_TYPE<T>;
+            user_game_data?: USER_GAME_DATA_TYPE<T>;
         }>('/shop/order/settle', {
-            id,
-            extra,
-            return_user_game_data: returnUserGameData,
+            ...param,
         }).then(res => res.data);
 
+    /**
+     * 获取所有已成功支付，但是“未处理”的订单
+     * @param key 与后台事先约定的项目名
+     */
     public static fetchUnsettledOrder = (key: string = '') =>
         HttpRequest.post<{
             orders: {
@@ -90,6 +152,7 @@ export default class Purchase {
                     key: string;
                     par: string;
                     price: number;
+                    cp_id?: string;
                 }>;
             };
         }>(`/shop/order/unsettled/${key}`).then(res => res.data);
