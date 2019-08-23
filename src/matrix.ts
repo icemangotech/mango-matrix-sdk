@@ -1,6 +1,6 @@
 import HttpRequest from './http';
 import BuriedPoint from './buried';
-import Purchase from './purchase';
+import Purchase, { PurchaseRestrict } from './purchase';
 import {
     WMP_PLATFORM_DATA,
     WMP_INFO,
@@ -11,6 +11,7 @@ import {
     NAVIGATE_BOX_ITEM_TYPE,
 } from './data';
 import Environment from './environment';
+import { PURCHASE_RESTRICT, IP_INFO } from './variables';
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
 
@@ -45,7 +46,8 @@ export default class Matrix {
         BuriedPoint.lastTimestamp = Date.now();
 
         const { query, scene } = Environment.getLaunchOptionsSync();
-        ['share_id', 'share_doc_id', 'channel_id', 'mango_tmpid'].forEach(item => {
+        ['share_id', 'share_doc_id', 'channel_id', 'mango_tmpid'].forEach(
+            item => {
                 Environment.setStorageItem(item, query[item]);
             }
         );
@@ -188,12 +190,12 @@ export default class Matrix {
             'mango_tmpid',
             'scene',
         ].forEach(item => {
-            res[item] = Environment.getStorageItem(item) || null ;
+            res[item] = Environment.getStorageItem(item) || null;
         });
         return res;
     }
 
-    public static async login<T, G>(
+    public static async login<T, G extends { purchase?: PurchaseRestrict }>(
         code?: string
     ): Promise<{
         server_time: number;
@@ -230,6 +232,10 @@ export default class Matrix {
         ).then(res => {
             HttpRequest.platformData = res.data.platform_data;
             HttpRequest.setSid(res.data.sid);
+            this.savePurchaseInfo(
+                res.data.game_config.purchase,
+                res.data.ip_info
+            );
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map(
@@ -307,7 +313,7 @@ export default class Matrix {
      *
      * @platform Wechat
      */
-    public static async onAuth<T, G>(
+    public static async onAuth<T, G extends { purchase?: PurchaseRestrict }>(
         info: WMP_INFO
     ): Promise<{
         server_time: number;
@@ -335,6 +341,10 @@ export default class Matrix {
         }).then(res => {
             HttpRequest.platformData = res.data.platform_data;
             HttpRequest.setSid(res.data.sid);
+            this.savePurchaseInfo(
+                res.data.game_config.purchase,
+                res.data.ip_info
+            );
             return {
                 ...res.data,
                 navigate_list: res.data.navigate_list.map(
@@ -382,7 +392,10 @@ export default class Matrix {
      *
      * @platform Wechat
      */
-    public static async getUserInfo<T, G>(): Promise<{
+    public static async getUserInfo<
+        T,
+        G extends { purchase?: PurchaseRestrict }
+    >(): Promise<{
         server_time: number;
         sid: string;
         user_data: USER_DATA_TYPE;
@@ -404,6 +417,7 @@ export default class Matrix {
         }).then(res => {
             HttpRequest.platformData = res.data.platform_data;
             HttpRequest.setSid(res.data.sid);
+            this.savePurchaseInfo(res.data.game_config.purchase)
             return res.data;
         });
     }
@@ -455,7 +469,9 @@ export default class Matrix {
     /**
      * 获取游戏配置
      */
-    public static async getGameConfig<G>(): Promise<{
+    public static async getGameConfig<
+        G extends { purchase?: PurchaseRestrict }
+    >(): Promise<{
         game_config: G;
         navigate: NAVIGATE_BOX_ITEM_TYPE;
         navigate_list: NAVIGATE_BOX_ITEM_TYPE[];
@@ -469,19 +485,14 @@ export default class Matrix {
         };
         ip_info: USER_IP_INFO_TYPE;
     }> {
-        return HttpRequest.post('/game/config', {}).then(res => ({
-            ...res.data,
-            navigate_list: res.data.navigate_list.map(
-                (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
-                    ...item,
-                    id: String(item.id),
-                    query: Object.keys(item.query)
-                        .map(k => `${k}=${item.query[k]}`)
-                        .join('&'),
-                })
-            ),
-            box_layout: {
-                highlight: res.data.box_layout.highlight.map(
+        return HttpRequest.post('/game/config', {}).then(res => {
+            this.savePurchaseInfo(
+                res.data.game_config.purchase,
+                res.data.ip_info
+            );
+            return {
+                ...res.data,
+                navigate_list: res.data.navigate_list.map(
                     (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
                         ...item,
                         id: String(item.id),
@@ -490,24 +501,35 @@ export default class Matrix {
                             .join('&'),
                     })
                 ),
-                category: res.data.box_layout.category.map(
-                    (c: {
-                        name: string;
-                        icon: string;
-                        list: NAVIGATE_BOX_ITEM_RES_TYPE[];
-                    }) => ({
-                        ...c,
-                        list: c.list.map(item => ({
+                box_layout: {
+                    highlight: res.data.box_layout.highlight.map(
+                        (item: NAVIGATE_BOX_ITEM_RES_TYPE) => ({
                             ...item,
                             id: String(item.id),
                             query: Object.keys(item.query)
                                 .map(k => `${k}=${item.query[k]}`)
                                 .join('&'),
-                        })),
-                    })
-                ),
-            },
-        }));
+                        })
+                    ),
+                    category: res.data.box_layout.category.map(
+                        (c: {
+                            name: string;
+                            icon: string;
+                            list: NAVIGATE_BOX_ITEM_RES_TYPE[];
+                        }) => ({
+                            ...c,
+                            list: c.list.map(item => ({
+                                ...item,
+                                id: String(item.id),
+                                query: Object.keys(item.query)
+                                    .map(k => `${k}=${item.query[k]}`)
+                                    .join('&'),
+                            })),
+                        })
+                    ),
+                },
+            };
+        });
     }
 
     /**
@@ -543,5 +565,19 @@ export default class Matrix {
         return HttpRequest.post('/user/gamedata/score', { score }).then(res => {
             return res.data;
         });
+    }
+
+    private static savePurchaseInfo(
+        purchase?: PurchaseRestrict,
+        ipInfo?: USER_IP_INFO_TYPE
+    ) {
+        if (purchase) {
+            const str = JSON.stringify(purchase);
+            Environment.setStorageItem(PURCHASE_RESTRICT, str);
+        }
+        if (ipInfo) {
+            const str = JSON.stringify(ipInfo);
+            Environment.setStorageItem(IP_INFO, str);
+        }
     }
 }

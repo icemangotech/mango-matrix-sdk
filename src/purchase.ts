@@ -1,6 +1,7 @@
 import HttpRequest from './http';
-import { USER_GAME_DATA_TYPE } from './data';
+import { USER_GAME_DATA_TYPE, USER_IP_INFO_TYPE } from './data';
 import Environment from './environment';
+import { PURCHASE_RESTRICT, IP_INFO } from './variables';
 
 /**
  * 键为支付项目，值为具体的描述
@@ -44,6 +45,12 @@ export type PreOrderParams = { id: any; price: number; cp_id?: string } & (
               appId: string;
           };
       });
+
+export interface PurchaseRestrict {
+    disabled_cities: string[];
+    disabled_provinces: string[];
+    pay_type: 'web' | 'wmp';
+}
 
 export default class Purchase {
     /**
@@ -156,4 +163,24 @@ export default class Purchase {
                 }>;
             };
         }>(`/shop/order/unsettled/${key}`).then(res => res.data);
+
+    /**
+     * 基于定位判断当前内购是否可用
+     */
+    public static isPurchaseAvailable = () => {
+        const restrict: PurchaseRestrict | null = JSON.parse(
+            Environment.getStorageItem(PURCHASE_RESTRICT) || 'null'
+        );
+        const ipInfo: USER_IP_INFO_TYPE | null = JSON.parse(
+            Environment.getStorageItem(IP_INFO) || 'null'
+        );
+        if (restrict && ipInfo) {
+            return !(
+                restrict.disabled_provinces.includes(ipInfo.province) ||
+                restrict.disabled_cities.includes(ipInfo.city) ||
+                ipInfo.country !== 'China'
+            );
+        }
+        return false;
+    };
 }
