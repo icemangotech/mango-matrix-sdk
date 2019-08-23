@@ -3,12 +3,15 @@ var tslint = require('gulp-tslint');
 var concat = require('gulp-concat');
 var insert = require('gulp-insert');
 var gulpCopy = require('gulp-copy');
+const gulpZip = require('gulp-zip');
 var gulpClean = require('gulp-clean');
 var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var ts = require('gulp-typescript');
 var through = require('through2');
 var rollup = require('rollup');
+
+var pkg = require('./package.json')
 
 var lintFiles = [
     'src/*.ts',
@@ -75,6 +78,11 @@ function clean() {
 
 const build = gulp.series(lint, assemble, compress, clean);
 
+function zip() {
+    return gulp.src([pkg.types, pkg.min]).pipe(gulpZip(`${pkg.name}-${pkg.version}.zip`)).pipe(gulp.dest('bin'))
+}
+
+exports.zip = zip;
 exports.clean = clean;
 exports.build = build;
 exports.default = build;
