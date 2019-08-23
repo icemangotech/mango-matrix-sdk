@@ -37,7 +37,7 @@ export default class HttpRequest {
         openid: null,
     };
 
-    public static setSid(sid: string | null) {
+    public static setSid(sid?: string) {
         Environment.setStorageItem('sid', sid);
     }
 
