@@ -1,6 +1,7 @@
 import HttpRequest from './http';
 import BuriedPoint from './buried';
 import Purchase, { PurchaseRestrict } from './purchase';
+import { navigateBoxItemStringify } from './utils';
 import {
     PlatformDataWmp,
     LoginInfoWmp,
@@ -197,85 +198,14 @@ export default class Matrix {
 
     public static async login<T, G extends { purchase?: PurchaseRestrict }>(
         code?: string
-    ): Promise<{
-        server_time: number;
-        sid: string;
-        user_data: UserData;
-        user_game_data: UserGameData<T>;
-        game_config: G;
-        navigate: NavigateBoxItem;
-        navigate_list: NavigateBoxItem[];
-        box_layout: {
-            highlight: NavigateBoxItem[];
-            category: Array<{
-                name: string;
-                icon: string;
-                list: NavigateBoxItem[];
-            }>;
-        };
-        platform_data: PlatformDataWmp;
-        ip_info: UserIpInfo;
-    }> {
+    ) {
         let authCode = code;
         if (Environment.platform === 'wx') {
             const wxResult = await this.wxLogin();
             authCode = wxResult.code;
         }
         HttpRequest.auth = { code: authCode };
-        return HttpRequest.post(
-            `/user/auth/${Environment.platform === 'wx' ? 'wmp' : 'mp'}`,
-            {
-                ...this.getAuthData(),
-                info: null,
-                auth: HttpRequest.auth,
-            }
-        ).then(res => {
-            HttpRequest.platformData = res.data.platform_data;
-            HttpRequest.setSid(res.data.sid);
-            this.savePurchaseInfo(
-                res.data.game_config.purchase,
-                res.data.ip_info
-            );
-            return {
-                ...res.data,
-                navigate_list: res.data.navigate_list.map(
-                    (item: NavigateBoxItemResponse) => ({
-                        ...item,
-                        id: String(item.id),
-                        query: Object.keys(item.query)
-                            .map(k => `${k}=${item.query[k]}`)
-                            .join('&'),
-                    })
-                ),
-                box_layout: {
-                    highlight: res.data.box_layout.highlight.map(
-                        (item: NavigateBoxItemResponse) => ({
-                            ...item,
-                            id: String(item.id),
-                            query: Object.keys(item.query)
-                                .map(k => `${k}=${item.query[k]}`)
-                                .join('&'),
-                        })
-                    ),
-                    category: res.data.box_layout.category.map(
-                        (c: {
-                            name: string;
-                            icon: string;
-                            list: NavigateBoxItemResponse[];
-                        }) => ({
-                            ...c,
-                            list: c.list.map(item => ({
-                                ...item,
-                                id: String(item.id),
-                                query: Object.keys(item.query)
-                                    .map(k => `${k}=${item.query[k]}`)
-                                    .join('&'),
-                            })),
-                        })
-                    ),
-                },
-            };
-        });
+        return this.onAuthApi<T, G>(null);
     }
 
     /**
@@ -313,78 +243,10 @@ export default class Matrix {
      *
      * @platform Wechat
      */
-    public static async onAuth<T, G extends { purchase?: PurchaseRestrict }>(
+    public static onAuth<T, G extends { purchase?: PurchaseRestrict }>(
         info: LoginInfoWmp
-    ): Promise<{
-        server_time: number;
-        sid: string;
-        user_data: UserData;
-        user_game_data: UserGameData<T>;
-        game_config: G;
-        navigate: NavigateBoxItem;
-        navigate_list: NavigateBoxItem[];
-        box_layout: {
-            highlight: NavigateBoxItem[];
-            category: Array<{
-                name: string;
-                icon: string;
-                list: NavigateBoxItem[];
-            }>;
-        };
-        platform_data: PlatformDataWmp;
-        ip_info: UserIpInfo;
-    }> {
-        return HttpRequest.post('/user/auth/wmp', {
-            ...this.getAuthData(),
-            info,
-            auth: HttpRequest.auth,
-        }).then(res => {
-            HttpRequest.platformData = res.data.platform_data;
-            HttpRequest.setSid(res.data.sid);
-            this.savePurchaseInfo(
-                res.data.game_config.purchase,
-                res.data.ip_info
-            );
-            return {
-                ...res.data,
-                navigate_list: res.data.navigate_list.map(
-                    (item: NavigateBoxItemResponse) => ({
-                        ...item,
-                        id: String(item.id),
-                        query: Object.keys(item.query)
-                            .map(k => `${k}=${item.query[k]}`)
-                            .join('&'),
-                    })
-                ),
-                box_layout: {
-                    highlight: res.data.box_layout.highlight.map(
-                        (item: NavigateBoxItemResponse) => ({
-                            ...item,
-                            id: String(item.id),
-                            query: Object.keys(item.query)
-                                .map(k => `${k}=${item.query[k]}`)
-                                .join('&'),
-                        })
-                    ),
-                    category: res.data.box_layout.category.map(
-                        (c: {
-                            name: string;
-                            icon: string;
-                            list: NavigateBoxItemResponse[];
-                        }) => ({
-                            ...c,
-                            list: c.list.map(item => ({
-                                ...item,
-                                id: String(item.id),
-                                query: Object.keys(item.query)
-                                    .map(k => `${k}=${item.query[k]}`)
-                                    .join('&'),
-                            })),
-                        })
-                    ),
-                },
-            };
-        });
+    ) {
+        return this.onAuthApi<T, G>(info);
     }
 
     /**
@@ -395,31 +257,56 @@ export default class Matrix {
     public static async getUserInfo<
         T,
         G extends { purchase?: PurchaseRestrict }
-    >(): Promise<{
-        server_time: number;
-        sid: string;
-        user_data: UserData;
-        user_game_data: UserGameData<T>;
-        game_config: G;
-        platform_data: PlatformDataWmp;
-    }> {
+    >() {
         if (Environment.platform !== 'wx') {
             return Promise.reject('Not on WeChat');
         }
         const { iv, encryptedData } = await this.wxGetUserInfo();
-        return HttpRequest.post('/user/auth/wmp', {
+        return this.onAuthApi<T, G>({ iv, encryptedData });
+    }
+
+    private static async onAuthApi<
+        T,
+        G extends { purchase?: PurchaseRestrict }
+    >(info: LoginInfoWmp | null) {
+        const res = await HttpRequest.post<{
+            server_time: number;
+            sid: string;
+            user_data: UserData;
+            user_game_data: UserGameData<T>;
+            game_config: G;
+            navigate: NavigateBoxItem;
+            navigate_list: NavigateBoxItemResponse[];
+            box_layout: {
+                highlight: NavigateBoxItemResponse[];
+                category: Array<{
+                    name: string;
+                    icon: string;
+                    list: NavigateBoxItemResponse[];
+                }>;
+            };
+            platform_data: PlatformDataWmp;
+            ip_info: UserIpInfo;
+        }>(`/user/auth/${Environment.platform === 'wx' ? 'wmp' : 'mp'}`, {
             ...this.getAuthData(),
-            info: {
-                iv,
-                encryptedData,
-            },
+            info,
             auth: HttpRequest.auth,
-        }).then(res => {
-            HttpRequest.platformData = res.data.platform_data;
-            HttpRequest.setSid(res.data.sid);
-            this.savePurchaseInfo(res.data.game_config.purchase)
-            return res.data;
         });
+        const { navigate_list, box_layout, ...data } = res.data;
+        HttpRequest.platformData = data.platform_data;
+        HttpRequest.setSid(data.sid);
+        this.savePurchaseInfo(data.game_config.purchase, data.ip_info);
+        return {
+            ...data,
+            navigate_list: navigateBoxItemStringify(navigate_list),
+            box_layout: {
+                highlight: navigateBoxItemStringify(box_layout.highlight),
+                category: box_layout.category.map(cat => ({
+                    ...cat,
+                    list: navigateBoxItemStringify(cat.list),
+                })),
+            },
+        };
     }
 
     /**
@@ -471,62 +358,35 @@ export default class Matrix {
      */
     public static async getGameConfig<
         G extends { purchase?: PurchaseRestrict }
-    >(): Promise<{
-        game_config: G;
-        navigate: NavigateBoxItem;
-        navigate_list: NavigateBoxItem[];
-        box_layout: {
-            highlight: NavigateBoxItem[];
-            category: Array<{
-                name: string;
-                icon: string;
-                list: NavigateBoxItem[];
-            }>;
-        };
-        ip_info: UserIpInfo;
-    }> {
-        return HttpRequest.post('/game/config', {}).then(res => {
+    >() {
+        return HttpRequest.post<{
+            game_config: G;
+            navigate: NavigateBoxItem;
+            navigate_list: NavigateBoxItemResponse[];
+            box_layout: {
+                highlight: NavigateBoxItemResponse[];
+                category: Array<{
+                    name: string;
+                    icon: string;
+                    list: NavigateBoxItemResponse[];
+                }>;
+            };
+            ip_info: UserIpInfo;
+        }>('/game/config', {}).then(res => {
             this.savePurchaseInfo(
                 res.data.game_config.purchase,
                 res.data.ip_info
             );
+            const { navigate_list, box_layout, ...data } = res.data;
             return {
-                ...res.data,
-                navigate_list: res.data.navigate_list.map(
-                    (item: NavigateBoxItemResponse) => ({
-                        ...item,
-                        id: String(item.id),
-                        query: Object.keys(item.query)
-                            .map(k => `${k}=${item.query[k]}`)
-                            .join('&'),
-                    })
-                ),
+                ...data,
+                navigate_list: navigateBoxItemStringify(navigate_list),
                 box_layout: {
-                    highlight: res.data.box_layout.highlight.map(
-                        (item: NavigateBoxItemResponse) => ({
-                            ...item,
-                            id: String(item.id),
-                            query: Object.keys(item.query)
-                                .map(k => `${k}=${item.query[k]}`)
-                                .join('&'),
-                        })
-                    ),
-                    category: res.data.box_layout.category.map(
-                        (c: {
-                            name: string;
-                            icon: string;
-                            list: NavigateBoxItemResponse[];
-                        }) => ({
-                            ...c,
-                            list: c.list.map(item => ({
-                                ...item,
-                                id: String(item.id),
-                                query: Object.keys(item.query)
-                                    .map(k => `${k}=${item.query[k]}`)
-                                    .join('&'),
-                            })),
-                        })
-                    ),
+                    highlight: navigateBoxItemStringify(box_layout.highlight),
+                    category: box_layout.category.map(cat => ({
+                        ...cat,
+                        list: navigateBoxItemStringify(cat.list),
+                    })),
                 },
             };
         });
