@@ -2076,7 +2076,7 @@ js-yaml@^3.13.0, js-yaml@^3.13.1:
 
 "jsencrypt@https://github.com/icemangotech/jsencrypt.git":
   version "3.0.0-rc.1"
-  resolved "https://github.com/icemangotech/jsencrypt.git#dad62f897f439c09fa8539f2db67d3f3618e84e7"
+  resolved "https://github.com/icemangotech/jsencrypt.git#5afc9983cf874bc735f0fd162794dde8562ea73f"
 
 json-schema-traverse@^0.4.1:
   version "0.4.1"
