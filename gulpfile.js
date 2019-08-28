@@ -67,7 +67,9 @@ const assemble = gulp.series(tsc, makeBundle);
 
 function compress() {
     return gulp.src('bin/matrix.js')
-        .pipe(uglify())
+        .pipe(uglify({
+            compress: false,
+        }))
         .pipe(rename('matrix.min.js'))
         .pipe(gulp.dest('bin'));
 };
