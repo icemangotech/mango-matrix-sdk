@@ -1,5 +1,5 @@
 import Matrix from './matrix';
-if (window) {
+if (typeof window !== 'undefined') {
     (window as any).Matrix = Matrix;
 }
 export { Matrix };
