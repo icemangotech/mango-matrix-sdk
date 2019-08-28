@@ -55,7 +55,7 @@ export function querystring(query: string): object {
  * @returns {String}
  * @api public
  */
-export function querystringify(obj: object) {
+export function queryStringify(obj: object = {}) {
     return Object.keys(obj)
         .map(k => `${k}=${obj[k]}`)
         .join('&');

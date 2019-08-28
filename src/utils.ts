@@ -1,4 +1,5 @@
 import { NavigateBoxItemResponse, NavigateBoxItem } from './data';
+import { queryStringify } from './querystringify';
 
 export const navigateBoxItemStringify = (
     res: NavigateBoxItemResponse[]
@@ -6,7 +7,5 @@ export const navigateBoxItemStringify = (
     res.map(item => ({
         ...item,
         id: String(item.id),
-        query: Object.keys(item.query)
-            .map(k => `${k}=${item.query[k]}`)
-            .join('&'),
+        query: queryStringify(item.query),
     }));
