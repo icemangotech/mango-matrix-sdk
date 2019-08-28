@@ -2,6 +2,7 @@ import HttpRequest from './http';
 import { UserGameData, UserIpInfo } from './data';
 import Environment from './environment';
 import { PURCHASE_RESTRICT, IP_INFO } from './variables';
+import { queryStringify } from './querystringify';
 
 /**
  * 键为支付项目，值为具体的描述
@@ -44,6 +45,22 @@ export type PreOrderParams = { id: any; price: number; cp_id?: string } & (
               paySign: string;
               appId: string;
           };
+      }
+    | {
+          type: 'navigate';
+          params: {
+              appId: string;
+              query: any;
+              path: string;
+              extraData: any;
+              envVersion: 'develop' | 'trial' | 'release';
+          };
+      }
+    | {
+          type: 'service';
+          params: {
+              msg?: string;
+          };
       });
 
 export interface PurchaseRestrict {
@@ -69,36 +86,97 @@ export default class Purchase {
      * @param cpId 开发者指定的订单号，可以缺省
      * @param channel 支付通道id，该项暂时缺省
      */
-    public static onPreOrder = (
+    public static onPreOrder = async (
         key: string,
         par?: string,
         cpId?: string,
         channel?: any
-    ) =>
-        HttpRequest.post<PreOrderParams>(`/shop/order/add/${key}/${par}`, {
-            channel,
-            cp_id: cpId,
-        }).then(res => {
-            if (res.data.type === 'wmp' && Environment.platform === 'wx') {
-                const { params } = res.data;
-                return new Promise<PreOrderParams>((resolve, reject) => {
-                    wx.requestPayment({
-                        ...params,
-                        signType: params.signType as any,
-                        success: result => {
-                            resolve(res.data);
-                        },
-                        fail: err => {
-                            reject(Error(err.errMsg));
-                        },
+    ) => {
+        try {
+            const res = await HttpRequest.post<PreOrderParams>(
+                `/shop/order/add/${key}/${par}`,
+                {
+                    channel,
+                    cp_id: cpId,
+                }
+            );
+
+            switch (res.data.type) {
+                case 'wmp': {
+                    const { params } = res.data;
+                    return new Promise<PreOrderParams>((resolve, reject) => {
+                        wx.requestPayment({
+                            ...params,
+                            signType: params.signType as any,
+                            success: result => {
+                                resolve(res.data);
+                            },
+                            fail: err => {
+                                reject(Error(err.errMsg));
+                            },
+                        });
                     });
-                });
-            } else if (res.data.type === 'web') {
-                return res.data;
-            } else {
-                return Promise.reject(Error('Payment not supported.'));
+                }
+                case 'web':
+                    return res.data;
+                case 'service': {
+                    const { params } = res.data;
+                    if (params.msg) {
+                        await new Promise((resolve, reject) => {
+                            wx.showModal({
+                                title: '充值提示',
+                                content: params.msg,
+                                confirmText: '确定',
+                                success: ({ confirm }) => {
+                                    if (confirm) {
+                                        resolve();
+                                    } else {
+                                        reject('User choose cancel payment.');
+                                    }
+                                },
+                                fail: err => {
+                                    reject(Error(err.errMsg));
+                                },
+                            });
+                        });
+                    }
+                    return new Promise<PreOrderParams>((resolve, reject) => {
+                        (wx as any).openCustomerServiceConversation({
+                            sessionFrom: JSON.stringify({
+                                t: 'o',
+                                id: res.data.id,
+                            }),
+                            success: () => {
+                                resolve(res.data);
+                            },
+                            fail: err => {
+                                reject(Error(err.errMsg));
+                            },
+                        });
+                    });
+                }
+                case 'navigate': {
+                    const { query, path, ...params } = res.data.params;
+                    return new Promise<PreOrderParams>((resolve, reject) => {
+                        wx.navigateToMiniProgram({
+                            ...params,
+                            path: path + queryStringify(query),
+                            success: () => {
+                                resolve(res.data);
+                            },
+                            fail: err => {
+                                reject(Error(err.errMsg));
+                            },
+                        });
+                    });
+                }
+                default:
+                    return Promise.reject(Error(`Payment type not supported.`));
             }
-        });
+        } catch (error) {
+            return Promise.reject(error)
+        }
+    };
 
     /**
      * @param param.id 订单 ID
