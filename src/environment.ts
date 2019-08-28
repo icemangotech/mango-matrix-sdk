@@ -74,7 +74,7 @@ namespace Environment {
     }
 
     export function clearStorage() {
-        if (window && window.localStorage) {
+        if (typeof window !== 'undefined' && window.localStorage) {
             window.localStorage.clear();
         } else {
             wx.clearStorageSync();
@@ -82,7 +82,7 @@ namespace Environment {
     }
 
     export function setStorageItem(key: string, value?: string | null) {
-        if (window && window.localStorage) {
+        if (typeof window !== 'undefined' && window.localStorage) {
             window.localStorage.setItem(key, value);
         } else {
             wx.setStorageSync(key, value);
@@ -90,7 +90,7 @@ namespace Environment {
     }
 
     export function getStorageItem(key: string): string {
-        if (window && window.localStorage) {
+        if (typeof window !== 'undefined' && window.localStorage) {
             return window.localStorage.getItem(key);
         } else {
             return wx.getStorageSync(key);
