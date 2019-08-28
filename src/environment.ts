@@ -1,29 +1,10 @@
 import { querystring } from './querystringify';
 
 namespace Environment {
-    enum Engine {
-        None,
-        Egret,
-        Cocos,
-        Laya,
-    }
-
-    const checkVariableInWindow = (name: string) => {
-        const globalWindow = window || {};
-        return globalWindow.hasOwnProperty(name);
-    };
-
-    export const engine: Engine = checkVariableInWindow('egret')
-        ? Engine.Egret
-        : checkVariableInWindow('cc')
-        ? Engine.Cocos
-        : checkVariableInWindow('Laya')
-        ? Engine.Laya
-        : Engine.None;
 
     type Platform = 'wx' | 'web';
 
-    export const platform: Platform = wx ? 'wx' : 'web';
+    export const platform: Platform = typeof wx !== 'undefined' ? 'wx' : 'web';
 
     export function select<T>(
         platformSpecific: {
