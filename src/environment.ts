@@ -96,6 +96,14 @@ namespace Environment {
             return wx.getStorageSync(key);
         }
     }
+
+    export function removeStorageItem(key: string) {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            return window.localStorage.removeItem(key);
+        } else {
+            return wx.removeStorageSync(key);
+        }
+    }
 }
 
 export default Environment;
