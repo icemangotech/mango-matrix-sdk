@@ -1,7 +1,6 @@
 import { querystring } from './utils';
 
 namespace Environment {
-
     type Platform = 'wx' | 'web';
 
     export const platform: Platform = typeof wx !== 'undefined' ? 'wx' : 'web';
@@ -64,7 +63,6 @@ namespace Environment {
                     });
                 });
             default:
-
                 return fetch(url, {
                     body: postData,
                     headers: header,
@@ -82,6 +80,9 @@ namespace Environment {
     }
 
     export function setStorageItem(key: string, value?: string | null) {
+        if (!value) {
+            return;
+        }
         if (typeof window !== 'undefined' && window.localStorage) {
             window.localStorage.setItem(key, value);
         } else {
