@@ -1,4 +1,4 @@
-import { querystring } from './querystringify';
+import { querystring } from './utils';
 
 namespace Environment {
 

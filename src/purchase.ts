@@ -2,7 +2,7 @@ import HttpRequest from './http';
 import { UserGameData, UserIpInfo } from './data';
 import Environment from './environment';
 import { PURCHASE_RESTRICT, IP_INFO } from './variables';
-import { queryStringify } from './querystringify';
+import { queryStringify } from './utils';
 
 /**
  * 键为支付项目，值为具体的描述

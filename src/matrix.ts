@@ -13,6 +13,7 @@ import {
 } from './data';
 import Environment from './environment';
 import { PURCHASE_RESTRICT, IP_INFO } from './variables';
+import { queryStringify } from './utils';
 
 declare const MANGO_MATRIX_SDK_VERSION: string;
 
@@ -176,7 +177,10 @@ export default class Matrix {
             {}
         ).then(res => ({
             ...res.data,
-            shareQuery: `share_id=${HttpRequest.platformData.openid}&share_doc_id=${res.data.id}`,
+            shareQuery: queryStringify({
+                share_id: HttpRequest.platformData.openid,
+                share_doc_id: res.data.id,
+            }),
         }));
     }
 
