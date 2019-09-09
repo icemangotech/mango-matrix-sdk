@@ -160,7 +160,7 @@ export default class Purchase {
                     return new Promise<PreOrderParams>((resolve, reject) => {
                         wx.navigateToMiniProgram({
                             ...params,
-                            path: path + queryStringify(query),
+                            path: path + '?' + queryStringify(query),
                             success: () => {
                                 resolve(res.data);
                             },
@@ -174,7 +174,7 @@ export default class Purchase {
                     return Promise.reject(Error(`Payment type not supported.`));
             }
         } catch (error) {
-            return Promise.reject(error)
+            return Promise.reject(error);
         }
     };
 
