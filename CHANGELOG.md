@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/icemangotech/mango-matrix-sdk/compare/2.0.2...2.0.3) (2019-09-19)
+
+
+### Bug Fixes
+
+* Unexpected 'undefined' in onPreOrder ([4970057](https://github.com/icemangotech/mango-matrix-sdk/commit/4970057))
+* Wrong config structure of updateShareUserInfo ([5a06a54](https://github.com/icemangotech/mango-matrix-sdk/commit/5a06a54))
+
 ## [2.0.2](https://github.com/icemangotech/mango-matrix-sdk/compare/2.0.1...2.0.2) (2019-09-09)
 
 
