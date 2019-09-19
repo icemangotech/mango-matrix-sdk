@@ -147,7 +147,7 @@ export default class Matrix {
     ): Promise<{
         config: T;
     }> {
-        return HttpRequest.post(`/share/user/config/${userId}`, config).then(
+        return HttpRequest.post(`/share/user/config/${userId}`, {config}).then(
             res => res.data
         );
     }
