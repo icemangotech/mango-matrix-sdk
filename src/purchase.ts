@@ -88,7 +88,7 @@ export default class Purchase {
      */
     public static onPreOrder = async (
         key: string,
-        par?: string,
+        par: string = '',
         cpId?: string,
         channel?: any
     ) => {
